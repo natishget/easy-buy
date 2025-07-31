@@ -7,9 +7,12 @@ const page = () => {
 
   const handleClick = async () => {
     try {
-      const response: any = await axios.get("http://localhost:3001/auth/me", {
-        withCredentials: true,
-      });
+      const response: any = await axios.get(
+        "https://easy-buy-qa2t.onrender.com/auth/me",
+        {
+          withCredentials: true,
+        }
+      );
       setRes(response);
     } catch (error) {
       console.log(error);
