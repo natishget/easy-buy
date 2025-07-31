@@ -11,8 +11,13 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
 
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://easy-buy.vercel.app', // Replace with your actual frontend domain
+  ];
+
   app.enableCors({
-    origin: "http://localhost:3000", 
+    origin: allowedOrigins, 
     credentials: true, 
   });
 
