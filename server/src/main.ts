@@ -11,10 +11,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
 
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://easy-buy.vercel.app', // Replace with your actual frontend domain
-  ];
+  const allowedOrigins = process.env.PRODUCTION ? 
+    'http://localhost:3000'
+   : 'https://easy-buy.vercel.app';
 
   app.enableCors({
     origin: allowedOrigins, 
