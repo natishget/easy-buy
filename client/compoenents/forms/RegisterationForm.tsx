@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/lib/validationSchema";
 import { z } from "zod";
-import axios from "axios";
+// import axios from "axios";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Loading from "@/assests/icons/loading.png";

@@ -2,7 +2,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-const page = () => {
+const Page = () => {
   const [res, setRes] = useState();
 
   const handleClick = async () => {
@@ -26,4 +26,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

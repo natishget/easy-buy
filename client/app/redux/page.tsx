@@ -11,7 +11,7 @@ import { AppDispatch, RootState } from "@/state/store";
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-const page = () => {
+const Page = () => {
   const [amount, setAmount] = useState(1);
   const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch<AppDispatch>();
@@ -36,4 +36,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

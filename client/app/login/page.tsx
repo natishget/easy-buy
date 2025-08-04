@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import LoginForm from "@/compoenents/forms/LoginForm";
-const page = () => {
+const Page = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-gray-100">
       <div className="w-[80%] h-[80%] flex border border-gray-100 rounded-xl bg-white drop-shadow-lg ">
@@ -32,4 +32,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
