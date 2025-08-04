@@ -11,16 +11,13 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
 
-  const allowedOrigins = process.env.PRODUCTION ? 
-    'http://localhost:3000'
-   : 'https://easy-buy.vercel.app';
-
+  const allowedOrigins = process.env.ORIGIN
   app.enableCors({
     origin: allowedOrigins, 
     credentials: true, 
   });
 
   await app.listen(PORT || 3015);
-  console.log("server listening on port", PORT);
+  console.log("server listening on port", PORT, "for", process.env.ORIGIN);
 }
-bootstrap();
+bootstrap(); 
