@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "https://easy-buy-qa2t.onrender.com",
+    baseURL: "https://easy-buy-qa2t.onrender.com:3001",
     // withCredentials: true,
 });
 
