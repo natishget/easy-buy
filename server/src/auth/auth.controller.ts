@@ -35,7 +35,7 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('me')
     getMe(@Req() req: AuthenticatedRequest) {
-        console.log("me running ")
+        console.log('User:', req.user);
         return req.user;
     }
-}
+} 

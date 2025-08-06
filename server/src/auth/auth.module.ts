@@ -6,6 +6,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { PassportModule } from '@nestjs/passport';
 
 
 const Jwt_SecretKey = process.env.JWT_Secret_key;
@@ -13,6 +14,7 @@ const Jwt_SecretKey = process.env.JWT_Secret_key;
 @Module({
   imports: [
     PrismaModule,
+    PassportModule,
     JwtModule.register({
       secret: Jwt_SecretKey, // store this in .env in production!
       signOptions: { expiresIn: '1d' },
