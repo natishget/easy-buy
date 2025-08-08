@@ -2,12 +2,19 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UploadService } from 'src/upload/upload.service';
 
 @Injectable()
 export class ProductService {
-      constructor(private prisma: PrismaService) {}
-  
+  constructor(private prisma: PrismaService,
+    //  readonly upload: UploadService
+  ) { }
+
+  // async create(file: Express.Multer.File, createProductDto: CreateProductDto) {
   async create(createProductDto: CreateProductDto) {
+
+    // const uploaded = await this.upload.uploadToCloudinary(file);
+    // console.log("file upload response", uploaded)
     const product = await this.prisma.product.create({
       data: {
         title: createProductDto.title,
@@ -16,6 +23,8 @@ export class ProductService {
         price: createProductDto.price,
         category: createProductDto.category || "",
         sellerId: createProductDto.sellerId,
+        // ...createProductDto,
+        // imageUrl: uploaded.secure_url
       }
     })
     return {
@@ -25,7 +34,8 @@ export class ProductService {
       price: product.price,
       category: product.category,
       quantity: product.quantity,
-      sellerId: product.sellerId
+      sellerId: product.sellerId,
+      image: product.imageUrl,
     };
   }
 
@@ -37,8 +47,8 @@ export class ProductService {
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
-    if(!productExist)
-       throw new NotFoundException("Product Doesn't exist");
+    if (!productExist)
+      throw new NotFoundException("Product Doesn't exist");
     return productExist
   }
 
@@ -46,8 +56,8 @@ export class ProductService {
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
-    if(!productExist)
-       throw new NotFoundException(" Product Doesn't exist");
+    if (!productExist)
+      throw new NotFoundException(" Product Doesn't exist");
 
     return await this.prisma.product.update({
       data: {
@@ -65,9 +75,9 @@ export class ProductService {
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
-    if(!productExist)
-       throw new NotFoundException(" Product Doesn't exist");
-      
+    if (!productExist)
+      throw new NotFoundException(" Product Doesn't exist");
+
     return await this.prisma.product.delete({
       where: { id }
     })
