@@ -44,9 +44,11 @@ export class ProductService {
   }
 
   async findOne(id: number) {
+
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
+
     if (!productExist)
       throw new NotFoundException("Product Doesn't exist");
     return productExist

@@ -6,11 +6,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Post('create')
   @UseInterceptors(FileInterceptor('file'))
-  async create( 
+  async create(
     // @UploadedFile() file: Express.Multer.File, 
     @Body() createProductDto: CreateProductDto) {
     // return this.productService.create(file, createProductDto);
@@ -33,8 +33,10 @@ export class ProductController {
     return this.productService.update(+id, updateProductDto);
   }
 
+
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
+
 }

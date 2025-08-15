@@ -41,5 +41,5 @@ model Order {
   status     String   @default("pending")
   createdAt  DateTime @default(now())
   buyer      User     @relation("BuyerOrders", fields: [buyerId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

@@ -210,6 +210,16 @@ export class OrderService {
     })
   }
 
+  // change order status
+  async updateStatus(id: number, updateOrderStatusDto: UpdateOrderDto) {
+    return await this.prisma.order.update({
+      where: { id },
+      data: {
+        status: updateOrderStatusDto.status
+      }
+    })
+  }
+
   // cancel order only used by admins
   async remove(id: number) {
     const order = await this.prisma.order.findUnique({
@@ -226,13 +236,4 @@ export class OrderService {
     })
   }
 
-  // change order status
-  async updateStatus(id: number, updateOrderStatusDto: UpdateOrderDto) {
-    return await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: updateOrderStatusDto.status
-      }
-    })
-  }
 }
