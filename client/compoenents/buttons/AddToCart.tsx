@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { ShoppingCart } from "lucide-react";
+import React from "react";
 
 import { decrement, increment } from "@/state/cart/cartSlice";
 import { AppDispatch, RootState } from "@/state/store";

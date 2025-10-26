@@ -8,7 +8,7 @@ import {
   incrementAsync,
 } from "@/state/API/counterSlice";
 import { AppDispatch, RootState } from "@/state/store";
-import React, { useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 const Page = () => {

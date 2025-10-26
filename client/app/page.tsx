@@ -1,9 +1,7 @@
 // import Image from "next/image";
 "use client";
-import Link from "next/link";
-import Image from "next/image";
+
 import ProductCard from "@/compoenents/cards/ProductCard";
-import Nav from "@/compoenents/nav&foot/Nav";
 import { useEffect, useState } from "react";
 
 // redux

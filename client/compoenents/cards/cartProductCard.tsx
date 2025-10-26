@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
+import { useSelector } from "react-redux";
+import { RootState } from "@/state/store";
 import Image from "next/image";
 import AddToCart from "@/compoenents/buttons/AddToCart";
 
