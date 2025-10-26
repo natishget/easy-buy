@@ -13,7 +13,7 @@ import Loading from "@/assests/icons/loading.png";
 // redux
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { fetchAsync } from "@/state/API/ApiSlice";
+import { loginAsync } from "@/state/API/ApiSlice";
 
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -38,7 +38,7 @@ const LoginForm = () => {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      const response = await dispatch(fetchAsync(data)).unwrap();
+      const response = await dispatch(loginAsync(data)).unwrap();
       router.push("/me");
     } catch (error: any) {
       setError(error);

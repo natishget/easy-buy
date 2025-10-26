@@ -25,4 +25,7 @@ export class CreateProductDto {
     @IsNotEmpty()
     sellerId!: number
 
+    @IsString()
+    imageUrl?: string
+
 }

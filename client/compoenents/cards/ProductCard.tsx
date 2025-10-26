@@ -4,10 +4,14 @@ import AddToCart from "../buttons/AddToCart";
 
 interface Product {
   id: number;
-  name: string;
-  quantity: number;
-  image: string;
+  title: string;
+  description: string;
   price: number;
+  quantity: number;
+  imageUrl: string;
+  category: string;
+  sellerId: number;
+  createdAt: string;
 }
 
 const ProductCard = ({ product }: { product: Product }) => {
@@ -18,14 +22,14 @@ const ProductCard = ({ product }: { product: Product }) => {
     >
       <div>
         <Image
-          src={product.image}
-          alt={product.name}
+          src={product?.imageUrl || "/placeholder.jpg"}
+          alt="product image"
           className="rounded-xl aspect-square object-cover"
           width={300}
           height={100}
         />
-        <h1 className="mt-3 font-bold pl-3">Price: {product.price}</h1>
-        <p className="text-gray-500 pl-3">{product.name}</p>
+        <h1 className="mt-3 font-bold pl-3">Price: {product.price}Birr</h1>
+        <p className="text-gray-500 pl-3">{product.title}</p>
         <p className="pl-3 font-bold">
           Quantity:{" "}
           {product.quantity === 0 ? (
@@ -35,7 +39,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           )}
         </p>
       </div>
-      <AddToCart product={product} />
+      <AddToCart product={product} position={"horizontal"} />
     </div>
   );
 };

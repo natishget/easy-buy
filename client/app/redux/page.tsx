@@ -12,7 +12,6 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 const Page = () => {
-  const [amount, setAmount] = useState(1);
   const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch<AppDispatch>();
 

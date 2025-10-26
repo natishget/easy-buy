@@ -23,6 +23,7 @@ export class ProductService {
         price: createProductDto.price,
         category: createProductDto.category || "",
         sellerId: createProductDto.sellerId,
+        imageUrl: createProductDto.imageUrl
         // ...createProductDto,
         // imageUrl: uploaded.secure_url
       }
