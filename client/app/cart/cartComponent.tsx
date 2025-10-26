@@ -15,7 +15,7 @@ const CartComponent = () => {
         return (
           <div
             className="border border-gray-100 w-fit shadow-2xl rounded-xl"
-            key={product.product.id}
+            key={index}
           >
             <div className="flex justify-center align-center">
               <Image

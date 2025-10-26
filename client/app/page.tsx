@@ -5,8 +5,8 @@ import ProductCard from "@/compoenents/cards/ProductCard";
 import { useEffect, useState } from "react";
 
 // redux
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
 import { getAllProducts } from "@/state/API/ApiSlice";
 
 interface Product {
@@ -23,11 +23,11 @@ interface Product {
 
 export default function Home() {
   // for redux
-  const api = useSelector((state: RootState) => state.api.Product);
+  // const api = useSelector((state: RootState) => state.api.Product);
   const dispatch = useDispatch<AppDispatch>();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState();
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
