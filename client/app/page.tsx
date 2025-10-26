@@ -37,7 +37,7 @@ export default function Home() {
         const response = await dispatch(getAllProducts()).unwrap();
         console.log("response for product", response);
         setProducts(response);
-      } catch (error: any) {
+      } catch (error) {
         alert(error);
         console.log("error trying to get all the products", error);
       }
