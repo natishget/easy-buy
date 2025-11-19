@@ -81,16 +81,27 @@ export const getAllProducts = createAsyncThunk<
     void,
     { rejectValue: string }
 >("getAllProducts", async (_, { rejectWithValue }) => {
-    console.log("in slice calling the api")
     try {
         const response = await api.get("/product/get");
-        console.log("response after calling api in slice", response)
         return response.data;
     } catch (error: any) {
         console.log("error trying to get all product in slice", error)
         return rejectWithValue(
             error.reponse?.data?.message || "Failed to get Products"
         );
+    }
+});
+
+export const addProductAsync = createAsyncThunk<
+    Product,
+    object,
+    { rejectValue: string }
+>("addProductAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.post("/product/create", data);
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Add product failed");
     }
 });
 
@@ -138,6 +149,19 @@ const ApiSlice = createSlice({
                     state.loading = false;
                     state.error = action.error.message || "something went wrong";
                 });
+        builder
+            .addCase(addProductAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addProductAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.Product.push(action.payload);
+            })
+            .addCase(addProductAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "something went wrong";
+            });
     },
 });
 

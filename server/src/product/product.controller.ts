@@ -20,6 +20,7 @@ export class ProductController {
 
   @Get('get')
   findAll() {
+    console.log("called");
     return this.productService.findAll();
   }
 

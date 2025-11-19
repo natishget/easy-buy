@@ -23,6 +23,7 @@ export class AuthController {
     @Post('login')
     async login(@Body() dto: LoginUserDto, @Res({passthrough: true}) res: Response) {
         const {access_token, message} = await this.authService.loginUser(dto);
+        console.log("login", access_token)
         res.cookie('access_token', access_token, {
             httpOnly: true,
             secure: false, // use `true` in production with HTTPS
