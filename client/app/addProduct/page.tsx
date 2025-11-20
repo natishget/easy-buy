@@ -12,13 +12,12 @@ import Loading from "@/assests/icons/loading.png";
 
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { registerAsync } from "@/state/API/ApiSlice";
+import { addProductAsync } from "@/state/API/ApiSlice";
 
 type ProductForm = z.infer<typeof addProductSchema>;
 
 const addProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const api = useSelector((state: RootState) => state.api.loginResponse);
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState();
@@ -26,7 +25,7 @@ const addProductPage = () => {
   const onSubmit = async (data: ProductForm) => {
     setIsLoading(true);
     try {
-      const response = await dispatch(registerAsync(data));
+      const response = await dispatch(addProductAsync(data)).unwrap();
       console.log("response on form", response);
       // router.push("/login");
     } catch (error: any) {
@@ -57,7 +56,7 @@ const addProductPage = () => {
           type="text"
           id="title"
           {...register("title")}
-          placeholder="Full Name"
+          placeholder="Product Name"
           className="w-[45%] p-5  bg-[rgb(244,248,247)]"
         />{" "}
         <p className="text-red-500">{errors.title?.message}</p>
@@ -65,7 +64,7 @@ const addProductPage = () => {
         <input
           type="number"
           id="quantity"
-          {...register("quantity")}
+          {...register("quantity", { valueAsNumber: true })}
           placeholder="Quantity"
           className="w-[45%] p-5  bg-[rgb(244,248,247)]"
         />{" "}
@@ -92,7 +91,7 @@ const addProductPage = () => {
         <input
           type="number"
           id="price"
-          {...register("price")}
+          {...register("price", { valueAsNumber: true })}
           placeholder="Price"
           className="w-[45%] p-5  bg-[rgb(244,248,247)]"
         />{" "}

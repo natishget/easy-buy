@@ -29,8 +29,8 @@ export const loginSchema = z.object({
 export const addProductSchema = z.object({
     title: z.string().min(3, "Title must be atleast 3 Characters"),
     quantity: z.number().min(1, "Quantity must be greater than 0"),
+    price: z.number().min(1, "Price must be greater than 0"),
     category: z.string().min(3, "Category must be atleast 3 Characters"),
     imageUrl: z.string().url("Invalid URL"),
-    price: z.number().min(1, "Price must be greater than 0"),
     description: z.string().min(10, "Description must be atleast 10 Characters"),
 });

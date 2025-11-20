@@ -35,7 +35,7 @@ interface Product {
     quantity: number;
     imageUrl: string;
     category: string;
-    sellerId: number;
+    sellerId?: number;
     createdAt: string;
 }
 
@@ -124,7 +124,8 @@ export const addProductAsync = createAsyncThunk<
     { rejectValue: string }
 >("addProductAsync", async (data, { rejectWithValue }) => {
     try {
-        const response = await api.post("/product/create", data, { withCredentials: true });
+        const response = await api.post("/product/create", data,
+             { withCredentials: true });
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Add product failed");
