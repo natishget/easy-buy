@@ -19,10 +19,11 @@ const CartComponent = () => {
           >
             <div className="flex justify-center align-center">
               <Image
-                src={product.product?.imageUrl}
+                src={product.product?.imageUrl || "/placeholder.jpg"}
                 alt="product image"
                 className="rounded-xl aspect-square object-cover"
                 width={100}
+                height={100}
                 align-centert={100}
               />
               <AddToCart product={product.product} position="vertical" />
