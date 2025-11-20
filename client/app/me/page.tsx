@@ -1,27 +1,41 @@
 "use client";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+// Redux
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
+import { protectedRouteAsync } from "@/state/API/ApiSlice";
+
+interface User {
+  UserId: string;
+  name: string;
+  email: string;
+  phone: number;
+  isSeller: boolean;
+}
 
 const Page = () => {
-  const [res, setRes] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const [useInfo, setUserInfo] = useState<User>();
 
-  const handleClick = async () => {
-    try {
-      const response = await axios.get(
-        "https://easy-buy-qa2t.onrender.com/auth/me",
-        {
-          withCredentials: true,
-        }
-      );
-      setRes(JSON.stringify(response.data));
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const response = await dispatch(protectedRouteAsync()).unwrap();
+        console.log("response for product", response);
+        setUserInfo(response);
+      } catch (error) {
+        alert(error);
+        console.log("error trying to get all the products", error);
+      }
+    };
+    getProducts();
+  }, []);
+
   return (
     <div className="flex w-screen h-screen flex-col justify-center items-center gap-5">
-      <button onClick={handleClick}>send request</button>
-      <p>response {res}</p>
+      <p>{useInfo ? `Welcome, ${useInfo.name}` : "Loading..."}</p>
     </div>
   );
 };

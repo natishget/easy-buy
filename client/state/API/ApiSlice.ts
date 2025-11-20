@@ -8,6 +8,7 @@ interface ApiState {
     Product: Product[];
     loading: boolean;
     error: string | null;
+    user: User | null;
 }
 
 interface RegisterResponse {
@@ -38,6 +39,14 @@ interface Product {
     createdAt: string;
 }
 
+interface User {
+    UserId: string;
+    name: string;
+    email: string;
+    phone: number;
+    isSeller: boolean;
+}
+
 const initialState: ApiState = {
     registerResponse: {
         message: "",
@@ -48,6 +57,7 @@ const initialState: ApiState = {
     Product: [],
     loading: false,
     error: null,
+    user: null,
 };
 
 export const loginAsync = createAsyncThunk<
@@ -73,6 +83,21 @@ export const registerAsync = createAsyncThunk<
         return registerResponse.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Register failed");
+    }
+});
+
+export const protectedRouteAsync = createAsyncThunk<
+    User,
+    void,
+    { rejectValue: string }
+>("protectedRouteAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/auth/protected");
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(
+            error.response?.data?.message || "Failed to access protected route"
+        );
     }
 });
 
@@ -133,6 +158,19 @@ const ApiSlice = createSlice({
                     state.registerResponse = action.payload;
                 })
                 .addCase(registerAsync.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.error.message || "something went wrong";
+                }),
+            builder
+                .addCase(protectedRouteAsync.pending, (state) => {
+                    state.loading = true;
+                    state.error = null;
+                })
+                .addCase(protectedRouteAsync.fulfilled, (state, action) => {
+                    state.loading = false;
+                    state.user = action.payload;
+                })
+                .addCase(protectedRouteAsync.rejected, (state, action) => {
                     state.loading = false;
                     state.error = action.error.message || "something went wrong";
                 }),

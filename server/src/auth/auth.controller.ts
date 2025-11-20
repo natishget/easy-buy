@@ -33,7 +33,7 @@ export class AuthController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('me')
+    @Get('protected')
     getMe(@Req() req: AuthenticatedRequest) {
         console.log('User:', req.user);
         return req.user;
