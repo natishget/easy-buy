@@ -19,7 +19,7 @@ export class ProductController {
     @Body() createProductDto: CreateProductDto) {
       const sellerId = (req.user && ((req.user.userId as number) || (req.user.sub as any) || req.user.id)) as number;
     // return this.productService.create(file, createProductDto);
-    return this.productService.create({...createProductDto, sellerId});
+    return this.productService.create({...createProductDto}, sellerId);
 
   }
 
