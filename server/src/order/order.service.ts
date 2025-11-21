@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,18 +6,27 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class OrderService {
   constructor(private prisma: PrismaService) { }
-  async create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto[], buyerId: number) {
+    console.log(createOrderDto)
+if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
+      throw new BadRequestException('No order items provided');
+    }
 
-    return await this.prisma.order.create(
-      {
+    // build create operations for each cart item
+    const ops = createOrderDto.map((item) =>
+      this.prisma.order.create({
         data: {
-          productId: createOrderDto.productId,
-          quantity: createOrderDto.quantity,
-          totalPrice: createOrderDto.totalPrice,
-          buyerId: createOrderDto.buyerId,
-        }
-      }
-    )
+          productId: item.productId,
+          quantity: item.quantity,
+          totalPrice: item.totalPrice,
+          buyerId: Number(buyerId),
+        },
+      }),
+    );
+
+    // run all creates in a single transaction
+    const created = await this.prisma.$transaction(ops);
+    return created;
   }
 
   // get all orders

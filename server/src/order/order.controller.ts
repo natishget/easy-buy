@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post('create')
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Req() req: any, @Body() createOrderDto: CreateOrderDto[]) {
+    const isSeller = req.user?.sub || req.user?.isSeller;
+    if(isSeller) {
+      throw new Error('Sellers cannot place orders');
+    }
+    const buyerId = req.user?.sub || req.user?.id || req.user?.userId;
+    return this.orderService.create(createOrderDto, buyerId);
   }
 
   @Get('get')
