@@ -10,30 +10,33 @@ const CartComponent = () => {
   const cartProducts = useSelector((state: RootState) => state.cart.items);
 
   return (
-    <div>
+    <div className="w-[60%]">
       {cartProducts.map((product, index) => {
         return (
           <div
-            className="border border-gray-100 w-fit shadow-2xl rounded-xl"
+            className="border border-gray-100 bg-white w-fit shadow-2xl rounded-xl"
             key={index}
           >
-            <div className="flex justify-center align-center">
+            <div className="flex gap-5 justify-center align-center">
               <Image
                 src={product.product?.imageUrl || "/placeholder.jpg"}
                 alt="product image"
                 className="rounded-xl aspect-square object-cover"
-                width={100}
+                width={150}
                 height={100}
                 align-centert={100}
               />
               <AddToCart product={product.product} position="vertical" />
-              <div className="flex text-xl gap-20 h-full justify-center align-center">
+              <div className="flex text-xl gap-10 h-full justify-center items-center my-10 mx-3">
                 <p className="text-gray-500 px-10">{product.product?.title}</p>
                 <h1 className=" font-bold">
-                  Price: {product.product.price}Birr
+                  Unit Price:{" "}
+                  <span className="text-teal-500">
+                    ${product.product.price}
+                  </span>{" "}
                 </h1>
                 <p className="font-bold">
-                  Quantity:{" "}
+                  Avaliable Quantity:{" "}
                   {product.product.quantity === 0 ? (
                     <span className="text-red-700">Out of Stock</span>
                   ) : (

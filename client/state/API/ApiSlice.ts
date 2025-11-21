@@ -5,6 +5,7 @@ interface ApiState {
     registerResponse: RegisterResponse;
     loginResponse: LoginResponse;
     Product: Product[];
+    Order: Order[];
     loading: boolean;
     error: string | null;
     user: User | null;
@@ -19,6 +20,8 @@ interface RegisterResponse {
     };
     error?: string;
 }
+
+
 
 interface LoginResponse {
     token?: string;
@@ -47,6 +50,12 @@ export interface User {
     isSeller?: boolean;
 }
 
+interface Order {
+    productId: number;
+    totalPrice: number;
+    quantity: number;
+}
+
 const initialState: ApiState = {
     registerResponse: {
         message: "",
@@ -55,6 +64,7 @@ const initialState: ApiState = {
     },
     loginResponse: { token: "", message: "", error: "" },
     Product: [],
+    Order: [],
     loading: false,
     error: null,
     user: null,
@@ -129,6 +139,20 @@ export const addProductAsync = createAsyncThunk<
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Add product failed");
+    }
+});
+
+export const createOrderAsync = createAsyncThunk<
+    Order,
+    object,
+    { rejectValue: string }
+>("createOrderAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.post("/order/create", data,
+             { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Place order failed");
     }
 });
 
@@ -217,7 +241,21 @@ const ApiSlice = createSlice({
             .addCase(addProductAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
-            });
+            })
+
+            // create order
+            .addCase(createOrderAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createOrderAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.Order.push(action.payload);
+            })
+            .addCase(createOrderAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
     },
 });
 

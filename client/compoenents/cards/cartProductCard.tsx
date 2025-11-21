@@ -14,7 +14,7 @@ const CartProductCard = () => {
       {cartProducts.map((product, index) => {
         return (
           <div
-            className="border border-gray-100 w-fit shadow-2xl rounded-xl"
+            className="border border-white-100 bg-white w-fit shadow-2xl rounded-xl"
             key={product.product.id}
           >
             <div>
