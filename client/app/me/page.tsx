@@ -5,7 +5,7 @@ import { AppDispatch } from "@/state/store";
 import { protectedRouteAsync } from "@/state/API/ApiSlice";
 
 interface User {
-  UserId: string;
+  userId: string;
   name: string;
   email: string;
   phone?: number;
@@ -46,7 +46,11 @@ const Page = () => {
 
   return (
     <div className="flex w-screen h-screen flex-col justify-center items-center gap-5">
-      <p>{userInfo ? `Welcome, ${userInfo.name}` : "Not authenticated"}</p>
+      <p>
+        {userInfo
+          ? `Welcome, ${userInfo.name + userInfo.userId + userInfo.isSeller}`
+          : "Not authenticated"}
+      </p>
     </div>
   );
 };

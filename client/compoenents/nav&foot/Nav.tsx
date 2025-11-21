@@ -5,13 +5,49 @@ import ProductSearch from "../forms/ProductSearch";
 import { ShoppingCart, Bell, CircleUserRound } from "lucide-react";
 import { usePathname } from "next/navigation";
 
+// redux
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
+import { protectedRouteAsync } from "@/state/API/ApiSlice";
+
+interface User {
+  UserId: string;
+  name: string;
+  email: string;
+  phone?: number;
+  isSeller?: boolean;
+}
+
 const Nav = () => {
   const pathname = usePathname();
+  const dispatch = useDispatch<AppDispatch>();
   const [location, setLocation] = useState(pathname);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   useEffect(() => {
     setLocation(pathname);
   }, [pathname]);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        setIsLoading(true);
+        const response = await dispatch(protectedRouteAsync()).unwrap();
+        console.log("protectedRoute response:", response);
+        setUserInfo(response);
+      } catch (err: any) {
+        console.error("failed to load protected route:", err);
+        // show a friendly message (err may be an object)
+        alert(err?.message || JSON.stringify(err) || "Failed to load user");
+        setUserInfo(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUser();
+  }, [dispatch]);
 
   return (
     <nav
@@ -21,7 +57,7 @@ const Nav = () => {
       <h1 className="font-bold text-3xl text-[rgb(56,177,151)]">
         Easy<span className="text-gray-800">Buy</span>
       </h1>
-      <h1 className="text-xl">Hello Natnael Getachew</h1>
+      <h1 className="text-xl">Hello {userInfo?.name}</h1>
       <div className="flex items-center gap-10 text-lg font-semibold">
         <ProductSearch />
         <Link
