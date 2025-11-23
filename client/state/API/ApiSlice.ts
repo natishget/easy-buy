@@ -5,7 +5,9 @@ interface ApiState {
     registerResponse: RegisterResponse;
     loginResponse: LoginResponse;
     Product: Product[];
-    Order: Order[];
+    CreateOrder: CreateOrder[];
+    BuyerOrder: Order[];
+    SellerOrder: Order[];
     loading: boolean;
     error: string | null;
     user: User | null;
@@ -42,6 +44,34 @@ interface Product {
     createdAt: string;
 }
 
+interface Order {
+    id: number;
+    product: {
+            id: number
+            title: string;
+            price: number;
+            description: string;
+            category: string;
+            seller: {
+                id: number;
+                name: string;
+                phone: string;
+                email: string;
+                isSeller: boolean;
+            }
+        };
+        buyer: {
+            id: number;
+            name: string;
+            phone: string;
+            email: string;
+            isSeller: boolean;
+        },
+        quantity: number;
+        createdAt: Date;
+        status: string;
+}
+
 export interface User {
     UserId: string;
     name: string;
@@ -50,7 +80,7 @@ export interface User {
     isSeller?: boolean;
 }
 
-interface Order {
+interface CreateOrder {
     productId: number;
     totalPrice: number;
     quantity: number;
@@ -64,7 +94,9 @@ const initialState: ApiState = {
     },
     loginResponse: { token: "", message: "", error: "" },
     Product: [],
-    Order: [],
+    CreateOrder: [],
+    BuyerOrder: [],
+    SellerOrder: [],
     loading: false,
     error: null,
     user: null,
@@ -143,7 +175,7 @@ export const addProductAsync = createAsyncThunk<
 });
 
 export const createOrderAsync = createAsyncThunk<
-    Order,
+    CreateOrder,
     object,
     { rejectValue: string }
 >("createOrderAsync", async (data, { rejectWithValue }) => {
@@ -153,6 +185,32 @@ export const createOrderAsync = createAsyncThunk<
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Place order failed");
+    }
+});
+
+export const getBuyerOrdersAsync = createAsyncThunk<
+    Order[],
+    void,
+    { rejectValue: string }
+>("getBuyerOrdersAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/order/getBuyerOrders", { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get buyer orders");
+    }
+});
+
+export const getSellerOrdersAsync = createAsyncThunk<
+    Order[],
+    void,
+    { rejectValue: string }
+>("getSellerOrdersAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/order/getSellerOrders", { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get seller orders");
     }
 });
 
@@ -250,12 +308,40 @@ const ApiSlice = createSlice({
             })
             .addCase(createOrderAsync.fulfilled, (state, action) =>{
                 state.loading = false;
-                state.Order.push(action.payload);
+                state.CreateOrder.push(action.payload);
             })
             .addCase(createOrderAsync.rejected, (state, action) =>{
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
             })
+
+            // get buyer orders
+            .addCase(getBuyerOrdersAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getBuyerOrdersAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.BuyerOrder = action.payload;
+            })
+            .addCase(getBuyerOrdersAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // get seller orders
+            .addCase(getSellerOrdersAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSellerOrdersAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.SellerOrder = action.payload;
+            })
+            .addCase(getSellerOrdersAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            });
     },
 });
 
