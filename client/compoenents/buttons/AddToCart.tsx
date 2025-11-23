@@ -44,8 +44,8 @@ const AddToCart = ({
         <div
           className={`${
             position === "horizontal"
-              ? "flex gap-10 justify-center align-center"
-              : "flex flex-col gap-2 justify-center align-center"
+              ? "flex gap-10 justify-center items-center"
+              : "flex flex-col gap-2 justify-center items-center"
           } w-full  my-3 text-xl`}
         >
           <button
