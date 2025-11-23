@@ -149,6 +149,8 @@ if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
           }
         },
         quantity: true,
+        createdAt: true,
+        status: true,
       }
     })
 

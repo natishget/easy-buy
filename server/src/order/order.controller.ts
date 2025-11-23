@@ -29,10 +29,15 @@ export class OrderController {
     return this.orderService.findOne(+id);
   }
 
-  @Get('getBuyerOrders/:id')
-  findByBuyerId(@Param('id') id: string) {
-    console.log("by user id ")
-    return this.orderService.findByBuyerId(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get('getBuyerOrders')
+  findByBuyerId(@Req() req: any) {
+    const isSeller = req.user?.sub || req.user?.isSeller;
+    if(isSeller) {
+      throw new Error('Unauthorized: Sellers cannot access buyer orders');
+    }
+    const buyerId = req.user?.sub || req.user?.id || req.user?.userId;
+    return this.orderService.findByBuyerId(+buyerId);
   }
 
   @Get('getSellerOrders/:id')
