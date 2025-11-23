@@ -11,7 +11,7 @@ export class ProductService {
   ) { }
 
   // async create(file: Express.Multer.File, createProductDto: CreateProductDto) {
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, sellerId: number) {
 
     // const uploaded = await this.upload.uploadToCloudinary(file);
     // console.log("file upload response", uploaded)
@@ -22,8 +22,8 @@ export class ProductService {
         description: createProductDto.description || "",
         price: createProductDto.price,
         category: createProductDto.category || "",
-        sellerId: createProductDto.sellerId,
-        imageUrl: createProductDto.imageUrl
+        imageUrl: createProductDto.imageUrl,
+        sellerId: sellerId
         // ...createProductDto,
         // imageUrl: uploaded.secure_url
       }

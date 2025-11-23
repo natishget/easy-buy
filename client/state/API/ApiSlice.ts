@@ -1,13 +1,16 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
 import api from "@/lib/api";
 
 interface ApiState {
     registerResponse: RegisterResponse;
     loginResponse: LoginResponse;
     Product: Product[];
+    CreateOrder: CreateOrder[];
+    BuyerOrder: Order[];
+    SellerOrder: Order[];
     loading: boolean;
     error: string | null;
+    user: User | null;
 }
 
 interface RegisterResponse {
@@ -17,13 +20,16 @@ interface RegisterResponse {
         name: string;
         email: string;
     };
-    error: string;
+    error?: string;
 }
 
+
+
 interface LoginResponse {
-    token: string;
-    message: string;
-    error: string;
+    token?: string;
+    message?: string;
+    error?: string;
+    access_token?: string;
 }
 
 interface Product {
@@ -34,8 +40,50 @@ interface Product {
     quantity: number;
     imageUrl: string;
     category: string;
-    sellerId: number;
+    sellerId?: number;
     createdAt: string;
+}
+
+interface Order {
+    id: number;
+    product: {
+            id: number
+            title: string;
+            price: number;
+            description: string;
+            category: string;
+            seller: {
+                id: number;
+                name: string;
+                phone: string;
+                email: string;
+                isSeller: boolean;
+            }
+        };
+        buyer: {
+            id: number;
+            name: string;
+            phone: string;
+            email: string;
+            isSeller: boolean;
+        },
+        quantity: number;
+        createdAt: Date;
+        status: string;
+}
+
+export interface User {
+    UserId: string;
+    name: string;
+    email: string;
+    phone?: number;
+    isSeller?: boolean;
+}
+
+interface CreateOrder {
+    productId: number;
+    totalPrice: number;
+    quantity: number;
 }
 
 const initialState: ApiState = {
@@ -46,17 +94,25 @@ const initialState: ApiState = {
     },
     loginResponse: { token: "", message: "", error: "" },
     Product: [],
+    CreateOrder: [],
+    BuyerOrder: [],
+    SellerOrder: [],
     loading: false,
     error: null,
+    user: null,
 };
 
+// Login: send credentials, server sets cookie and returns token/message.
+// After successful login we dispatch protectedRouteAsync to load the user into redux.
 export const loginAsync = createAsyncThunk<
     LoginResponse,
     object,
-    { rejectValue: string }
->("loginAsync", async (data, { rejectWithValue }) => {
+    { rejectValue: string; dispatch: any }
+>("loginAsync", async (data, { rejectWithValue, dispatch }) => {
     try {
-        const loginResponse = await api.post("/auth/login", data);
+        const loginResponse = await api.post("/auth/login", data, { withCredentials: true });
+        // after successful login, fetch user info and store it
+        dispatch(protectedRouteAsync());
         return loginResponse.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -69,10 +125,24 @@ export const registerAsync = createAsyncThunk<
     { rejectValue: string }
 >("registerAsync", async (data, { rejectWithValue }) => {
     try {
-        const registerResponse = await api.post("/auth/register", data);
+        const registerResponse = await api.post("/auth/register", data, { withCredentials: true });
         return registerResponse.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Register failed");
+    }
+});
+
+// Protected route: ensures cookie is sent and returns user object
+export const protectedRouteAsync = createAsyncThunk<
+    User,
+    void,
+    { rejectValue: string }
+>("protectedRouteAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/auth/protected", { withCredentials: true });
+        return response.data as User;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to access protected route");
     }
 });
 
@@ -81,25 +151,86 @@ export const getAllProducts = createAsyncThunk<
     void,
     { rejectValue: string }
 >("getAllProducts", async (_, { rejectWithValue }) => {
-    console.log("in slice calling the api")
     try {
         const response = await api.get("/product/get");
-        console.log("response after calling api in slice", response)
         return response.data;
     } catch (error: any) {
-        console.log("error trying to get all product in slice", error)
-        return rejectWithValue(
-            error.reponse?.data?.message || "Failed to get Products"
-        );
+        console.log("error trying to get all product in slice", error);
+        return rejectWithValue(error.response?.data?.message || "Failed to get Products");
+    }
+});
+
+export const addProductAsync = createAsyncThunk<
+    Product,
+    object,
+    { rejectValue: string }
+>("addProductAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.post("/product/create", data,
+             { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Add product failed");
+    }
+});
+
+export const createOrderAsync = createAsyncThunk<
+    CreateOrder,
+    object,
+    { rejectValue: string }
+>("createOrderAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.post("/order/create", data,
+             { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Place order failed");
+    }
+});
+
+export const getBuyerOrdersAsync = createAsyncThunk<
+    Order[],
+    void,
+    { rejectValue: string }
+>("getBuyerOrdersAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/order/getBuyerOrders", { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get buyer orders");
+    }
+});
+
+export const getSellerOrdersAsync = createAsyncThunk<
+    Order[],
+    void,
+    { rejectValue: string }
+>("getSellerOrdersAsync", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/order/getSellerOrders", { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get seller orders");
     }
 });
 
 const ApiSlice = createSlice({
     name: "api",
     initialState,
-    reducers: {},
+    reducers: {
+        setUser(state, action: PayloadAction<User>) {
+            state.user = action.payload;
+        },
+        clearUser(state) {
+            state.user = null;
+        },
+        clearError(state) {
+            state.error = null;
+        },
+    },
     extraReducers: (builder) => {
         builder
+            // login
             .addCase(loginAsync.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -110,35 +241,113 @@ const ApiSlice = createSlice({
             })
             .addCase(loginAsync.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message || "something went wrong";
-            }),
-            builder
-                .addCase(registerAsync.pending, (state) => {
-                    state.loading = true;
-                    state.error = null;
-                })
-                .addCase(registerAsync.fulfilled, (state, action) => {
-                    state.loading = false;
-                    state.registerResponse = action.payload;
-                })
-                .addCase(registerAsync.rejected, (state, action) => {
-                    state.loading = false;
-                    state.error = action.error.message || "something went wrong";
-                }),
-            builder
-                .addCase(getAllProducts.pending, (state) => {
-                    state.loading = true;
-                    state.error = null;
-                })
-                .addCase(getAllProducts.fulfilled, (state, action) => {
-                    state.loading = false;
-                    state.Product = action.payload;
-                })
-                .addCase(getAllProducts.rejected, (state, action) => {
-                    state.loading = false;
-                    state.error = action.error.message || "something went wrong";
-                });
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // register
+            .addCase(registerAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.registerResponse = action.payload;
+            })
+            .addCase(registerAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // protected route -> set user
+            .addCase(protectedRouteAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(protectedRouteAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(protectedRouteAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.user = null;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // products
+            .addCase(getAllProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAllProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.Product = action.payload;
+            })
+            .addCase(getAllProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // add product
+            .addCase(addProductAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addProductAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.Product.push(action.payload);
+            })
+            .addCase(addProductAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // create order
+            .addCase(createOrderAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createOrderAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.CreateOrder.push(action.payload);
+            })
+            .addCase(createOrderAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // get buyer orders
+            .addCase(getBuyerOrdersAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getBuyerOrdersAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.BuyerOrder = action.payload;
+            })
+            .addCase(getBuyerOrdersAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // get seller orders
+            .addCase(getSellerOrdersAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSellerOrdersAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                state.SellerOrder = action.payload;
+            })
+            .addCase(getSellerOrdersAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            });
     },
 });
 
+export const { setUser, clearUser, clearError } = ApiSlice.actions;
 export default ApiSlice.reducer;
+
+// selector helper (use in components to read user)
+export const selectUser = (state: any) => state.api.user;
+export const selectIsAuthenticated = (state: any) => !!state.api.user;

@@ -49,14 +49,18 @@ const AddToCart = ({
           } w-full  my-3 text-xl`}
         >
           <button
-            className="text-2xl border px-3"
+            className={`text-2xl border px-3 hover:bg-teal-500  hover:border-teal-500 hover:text-white hover:text-bold ${
+              position !== "horizontal" ? "rounded-full" : ""
+            }`}
             onClick={() => dispatch(decrement(product))}
           >
             -
           </button>
           <p>{quantity}</p>
           <button
-            className="border px-3"
+            className={`text-2xl border px-3 hover:bg-teal-500  hover:border-teal-500 hover:text-white hover:text-bold ${
+              position !== "horizontal" ? "rounded-full" : ""
+            }`}
             onClick={() => dispatch(increment(product))}
           >
             +

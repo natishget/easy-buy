@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post('create')
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@Req() req: any, @Body() createOrderDto: CreateOrderDto[]) {
+    const isSeller = req.user?.sub || req.user?.isSeller;
+    if(isSeller) {
+      throw new Error('Sellers cannot place orders');
+    }
+    const buyerId = req.user?.sub || req.user?.id || req.user?.userId;
+    return this.orderService.create(createOrderDto, buyerId);
   }
 
   @Get('get')
@@ -22,10 +29,15 @@ export class OrderController {
     return this.orderService.findOne(+id);
   }
 
-  @Get('getBuyerOrders/:id')
-  findByBuyerId(@Param('id') id: string) {
-    console.log("by user id ")
-    return this.orderService.findByBuyerId(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get('getBuyerOrders')
+  findByBuyerId(@Req() req: any) {
+    const isSeller = req.user?.sub || req.user?.isSeller;
+    if(isSeller) {
+      throw new Error('Unauthorized: Sellers cannot access buyer orders');
+    }
+    const buyerId = req.user?.sub || req.user?.id || req.user?.userId;
+    return this.orderService.findByBuyerId(+buyerId);
   }
 
   @Get('getSellerOrders/:id')

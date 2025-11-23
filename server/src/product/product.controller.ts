@@ -1,25 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile, UseInterceptors, UseGuards, Req } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
+
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post('create')
-  @UseInterceptors(FileInterceptor('file'))
-  async create(
+  // @UseInterceptors(FileInterceptor('file'))
+  async create(@Req() req: Request & { user?: any },
     // @UploadedFile() file: Express.Multer.File, 
     @Body() createProductDto: CreateProductDto) {
+      const sellerId = (req.user && ((req.user.userId as number) || (req.user.sub as any) || req.user.id)) as number;
     // return this.productService.create(file, createProductDto);
-    return this.productService.create(createProductDto);
+    return this.productService.create({...createProductDto}, sellerId);
 
   }
 
   @Get('get')
   findAll() {
+    console.log("called");
     return this.productService.findAll();
   }
 

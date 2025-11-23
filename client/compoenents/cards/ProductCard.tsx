@@ -17,7 +17,7 @@ interface Product {
 const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div
-      className="border border-gray-100 w-fit shadow-2xl rounded-xl"
+      className="border border-gray-100 bg-white w-fit shadow-2xl rounded-xl"
       key={product.id}
     >
       <div>
