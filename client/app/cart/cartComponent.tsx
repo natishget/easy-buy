@@ -10,14 +10,14 @@ const CartComponent = () => {
   const cartProducts = useSelector((state: RootState) => state.cart.items);
 
   return (
-    <div className="w-[60%]">
+    <div className="w-[60%] flex flex-col gap-10">
       {cartProducts.map((product, index) => {
         return (
           <div
-            className="border border-gray-100 bg-white w-fit shadow-2xl rounded-xl"
+            className="w-[900px] border border-gray-100 bg-white  shadow-2xl rounded-xl"
             key={index}
           >
-            <div className="flex gap-5 justify-center align-center">
+            <div className="w-fit flex gap-5 justify-center items-center">
               <Image
                 src={product.product?.imageUrl || "/placeholder.jpg"}
                 alt="product image"

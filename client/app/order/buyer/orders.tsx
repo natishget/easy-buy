@@ -53,7 +53,7 @@ const orders = () => {
     fetchOrders();
   }, [dispatch]);
   return (
-    <div className="w-fit flex flex-wrap justify-center">
+    <div className="w-fit flex flex-wrap ">
       {orders.map((order) => (
         <OrderCard key={order.id} orderData={order} />
       ))}
