@@ -24,10 +24,10 @@ const Page = () => {
         const response = await dispatch(protectedRouteAsync()).unwrap();
         console.log("protectedRoute response:", response);
         setUserInfo(response);
-      } catch (err: any) {
+      } catch (err) {
         console.error("failed to load protected route:", err);
         // show a friendly message (err may be an object)
-        alert(err?.message || JSON.stringify(err) || "Failed to load user");
+        alert(err || JSON.stringify(err) || "Failed to load user");
         setUserInfo(null);
       } finally {
         setLoading(false);
