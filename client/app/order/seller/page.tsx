@@ -1,7 +1,7 @@
 "use client";
 
 import Orders from "./orders";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { protectedRouteAsync } from "@/state/API/ApiSlice";
@@ -17,12 +17,6 @@ export default function SellerOrderPage() {
   useEffect(() => {
     dispatch(protectedRouteAsync());
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (initialized && !user) {
-  //     router.replace("/login");
-  //   }
-  // }, [initialized, user, router]);
 
   if (user?.isSeller === false) {
     router.replace("/order/buyer");

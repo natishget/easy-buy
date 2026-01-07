@@ -36,7 +36,7 @@ interface Order {
   status: string;
 }
 
-const orders = () => {
+const Orders: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -61,4 +61,4 @@ const orders = () => {
   );
 };
 
-export default orders;
+export default Orders;

@@ -10,13 +10,13 @@ import { z } from "zod";
 import Image from "next/image";
 import Loading from "@/assests/icons/loading.png";
 
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch, RootState } from "@/state/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/state/store";
 import { addProductAsync } from "@/state/API/ApiSlice";
 
 type ProductForm = z.infer<typeof addProductSchema>;
 
-const addProductPage = () => {
+const AddProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -124,4 +124,4 @@ const addProductPage = () => {
   );
 };
 
-export default addProductPage;
+export default AddProductPage;

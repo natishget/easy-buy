@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Orders from "./orders";
 import { useRouter } from "next/navigation";
 
@@ -22,12 +22,6 @@ export default function BuyerOrderPage() {
   if (user?.isSeller === true) {
     router.replace("/order/seller");
   }
-
-  // useEffect(() => {
-  //   if (initialized && !user) {
-  //     router.replace("/login");
-  //   }
-  // }, [initialized, user, router]);
 
   return (
     <div className="p-10">
