@@ -47,8 +47,11 @@ const CartSlice = createSlice({
                 state.items = state.items.filter((item) => item.product.id !== action.payload.id);
             }
         },
+        makeEmpty: (state) => {
+            state.items = [];
+        }
     }
 });
 
-export const { increment, decrement } = CartSlice.actions;
+export const { increment, decrement, makeEmpty } = CartSlice.actions;
 export default CartSlice.reducer;

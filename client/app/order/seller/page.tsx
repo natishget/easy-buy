@@ -1,3 +1,36 @@
+"use client";
+
+import Orders from "./orders";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
+import { protectedRouteAsync } from "@/state/API/ApiSlice";
+import { useRouter } from "next/navigation";
+
 export default function SellerOrderPage() {
-  return <div>Seller Order Page</div>;
+  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, loading, initialized } = useSelector(
+    (state: RootState) => state.api
+  );
+
+  useEffect(() => {
+    dispatch(protectedRouteAsync());
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (initialized && !user) {
+  //     router.replace("/login");
+  //   }
+  // }, [initialized, user, router]);
+
+  if (user?.isSeller === false) {
+    router.replace("/order/buyer");
+  }
+
+  return (
+    <div className="p-10">
+      <Orders />
+    </div>
+  );
 }

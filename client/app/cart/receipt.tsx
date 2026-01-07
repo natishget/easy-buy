@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { createOrderAsync } from "@/state/API/ApiSlice";
+import { makeEmpty } from "@/state/cart/cartSlice";
 
 const Receipt = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,7 @@ const Receipt = () => {
         })),
       };
       const response = await dispatch(createOrderAsync(data.items)).unwrap();
+      dispatch(makeEmpty());
       alert("success");
     } catch (error) {
       console.log(error);

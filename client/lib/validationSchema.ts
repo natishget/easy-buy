@@ -1,4 +1,4 @@
-import z from "zod";
+import {z} from "zod";
 
 export const registerSchema = z.object({
     name: z.string().min(3, "Name must be atleast 3 Characters"),
@@ -11,9 +11,7 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, "Password must atleast have one number")
     .regex(/^[a-zA-Z0-9]/, "Password must have atleast one Special character"),
     confirmPassword: z.string(),
-    isSeller: z.enum(["buyer", "seller"]).refine(val => val !== null && val !== undefined, {
-        message: "Please select Buyer or Seller",
-      }),
+    isSeller: z.enum(["seller", "buyer"], { message: "Please select Buyer or Seller" }),
     // isSeller: z.string().refine(val => val === "buyer" || val === "seller", { message: "Please select Buyer of Seller" }).transform(val => val==="seller")
 })
 .refine((data) => data.password === data.confirmPassword, {

@@ -14,4 +14,8 @@ export class CreateUserDto {
 
   @IsString()
   name?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  isSeller!: string;
 }

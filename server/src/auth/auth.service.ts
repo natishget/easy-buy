@@ -10,9 +10,12 @@ export class AuthService {
     constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
     async registerUser(dto: CreateUserDto){
+        
         const existingUser = await this.prisma.user.findUnique({
             where: { email: dto.email },
         });
+
+        
 
         if(existingUser){
             throw new ConflictException('User With that email already exists');
@@ -28,6 +31,7 @@ export class AuthService {
                 name: dto.name,
                 password: hashedPassword,
                 phone: dto.phone,
+                isSeller: dto.isSeller === "seller" ? true : false,
             },
         });
         return {

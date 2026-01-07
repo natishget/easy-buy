@@ -33,7 +33,6 @@ const Page = () => {
         setLoading(false);
       }
     };
-
     loadUser();
   }, [dispatch]);
 
