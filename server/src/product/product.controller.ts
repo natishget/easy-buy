@@ -23,12 +23,14 @@ export class ProductController {
 
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get')
   findAll() {
     console.log("called");
     return this.productService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get/:id')
   findOne(@Param('id') id: number) {
     return this.productService.findOne(+id);

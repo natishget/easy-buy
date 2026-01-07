@@ -14,13 +14,11 @@ export class UsersController {
 
   @Get('get')
   findAll() {
-    console.log("getting all users")
     return this.usersService.findAll();
   }
 
   @Get('get/:id')
   findOne(@Param('id') id: number) {
-    console.log("getting a single user", id)
     return this.usersService.findOne(+id);
   }
 
