@@ -5,9 +5,11 @@ import ProductCard from "@/compoenents/cards/ProductCard";
 import { useEffect, useState } from "react";
 
 // redux
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
 import { getAllProducts } from "@/state/API/ApiSlice";
+import { useRouter } from "next/navigation";
+import { protectedRouteAsync } from "@/state/API/ApiSlice";
 
 interface Product {
   id: number;
@@ -23,12 +25,24 @@ interface Product {
 
 export default function Home() {
   // for redux
-  // const api = useSelector((state: RootState) => state.api.Product);
   const dispatch = useDispatch<AppDispatch>();
 
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState();
   const [products, setProducts] = useState<Product[]>([]);
+
+  const router = useRouter();
+  const { user, loading, initialized } = useSelector(
+    (state: RootState) => state.api
+  );
+
+  useEffect(() => {
+    dispatch(protectedRouteAsync());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (initialized && !user) {
+      router.replace("/login");
+    }
+  }, [initialized, user, router]);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -43,8 +57,19 @@ export default function Home() {
         console.log("error trying to get all the products", error);
       }
     };
-    getProducts();
-  }, [dispatch]);
+    if (initialized && user) getProducts();
+  }, [dispatch, initialized, user]);
+
+  if (!initialized && loading)
+    return (
+      <div className="flex w-screen h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
+
+  if (user?.isSeller) {
+    router.replace("/order/seller");
+  }
 
   return (
     <div className="h-fit w-screen bg-gray-150">

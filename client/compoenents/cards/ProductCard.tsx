@@ -35,7 +35,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           {product.quantity === 0 ? (
             <span className="text-red-700">Out of Stock</span>
           ) : (
-            <span className="text-teal-500">10</span>
+            <span className="text-teal-500">{product.quantity}</span>
           )}
         </p>
       </div>

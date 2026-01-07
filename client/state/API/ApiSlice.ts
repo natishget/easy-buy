@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import api from "@/lib/api";
+import { RootState } from "../store";
 
 interface ApiState {
     registerResponse: RegisterResponse;
@@ -11,6 +12,7 @@ interface ApiState {
     loading: boolean;
     error: string | null;
     user: User | null;
+    initialized?: boolean;
 }
 
 interface RegisterResponse {
@@ -100,6 +102,7 @@ const initialState: ApiState = {
     loading: false,
     error: null,
     user: null,
+    initialized: false,
 };
 
 // Login: send credentials, server sets cookie and returns token/message.
@@ -144,6 +147,13 @@ export const protectedRouteAsync = createAsyncThunk<
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Failed to access protected route");
     }
+},
+{
+    condition: (_, { getState }) => {
+        const { user, loading } = (getState() as RootState).api;
+        // Skip if already initialized or currently loading
+        return !user && !loading;
+    },
 });
 
 export const getAllProducts = createAsyncThunk<
@@ -266,11 +276,13 @@ const ApiSlice = createSlice({
             .addCase(protectedRouteAsync.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload;
+                state.initialized = true;
             })
             .addCase(protectedRouteAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.user = null;
                 state.error = action.payload || action.error.message || "something went wrong";
+                state.initialized = true;
             })
 
             // products

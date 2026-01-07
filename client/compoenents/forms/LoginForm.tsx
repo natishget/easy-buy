@@ -39,7 +39,7 @@ const LoginForm = () => {
     setIsLoading(true);
     try {
       const response = await dispatch(loginAsync(data)).unwrap();
-      router.push("/me");
+      router.push("/");
     } catch (error: any) {
       setError(error);
     } finally {

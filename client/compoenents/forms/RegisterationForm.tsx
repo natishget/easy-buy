@@ -18,7 +18,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 const RegisterationForm = () => {
   // for redux
-  const api = useSelector((state: RootState) => state.api.loginResponse);
+  const api = useSelector((state: RootState) => state.api.registerResponse);
   const dispatch = useDispatch<AppDispatch>();
 
   const [error, setError] = useState();
@@ -36,10 +36,11 @@ const RegisterationForm = () => {
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
+    console.log("data from form", data);
     try {
       const response = await dispatch(registerAsync(data));
-      console.log("response on form", response);
-      // router.push("/login");
+      // console.log("response on form", response);
+      router.push("/login");
     } catch (error: any) {
       console.log("from form", error);
       setError(error?.payload || error);
@@ -64,8 +65,9 @@ const RegisterationForm = () => {
         <p className="text-red-500">{errors.name?.message}</p>
         <br />
         <input
-          type="number"
+          type="tel"
           id="phone"
+          inputMode="numeric"
           {...register("phone")}
           placeholder="Phone Number"
           className="w-[45%] p-5  bg-[rgb(244,248,247)]"
@@ -131,7 +133,7 @@ const RegisterationForm = () => {
           {isLoading ? (
             <Image src={Loading} alt="" className="animate-spin w-6" />
           ) : (
-            "SING Up"
+            "SIGN UP"
           )}
         </button>
         <p className="text-red-500">{error}</p>
