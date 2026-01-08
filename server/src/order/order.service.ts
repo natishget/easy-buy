@@ -201,6 +201,8 @@ if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
           }
         },
         quantity: true,
+        status: true,
+        createdAt: true,
       }
     })
 
@@ -222,7 +224,7 @@ if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
   }
 
   // change order status
-  async updateStatus(id: number, updateOrderStatusDto: UpdateOrderDto) {
+  async updateStatus(id: number,  updateOrderStatusDto: UpdateOrderDto) {
     return await this.prisma.order.update({
       where: { id },
       data: {

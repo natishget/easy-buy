@@ -6,6 +6,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderStatus {
+  pending
+  accepted
+  waiting
+  paid
+  delivering
+  sold
+  cancelled
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
@@ -38,8 +48,8 @@ model Order {
   buyerId    Int
   quantity   Int
   totalPrice Float
-  status     String   @default("pending")
-  createdAt  DateTime @default(now())
-  buyer      User     @relation("BuyerOrders", fields: [buyerId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status     OrderStatus   @default(pending)
+  createdAt  DateTime      @default(now())
+  buyer      User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  product    Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
