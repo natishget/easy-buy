@@ -46,7 +46,7 @@ interface Product {
     createdAt: string;
 }
 
-interface Order {
+export interface Order {
     id: number;
     product: {
             id: number

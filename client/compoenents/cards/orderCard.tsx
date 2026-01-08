@@ -1,9 +1,14 @@
 "use client";
 
 import React from "react";
-import { ChevronRight } from "lucide-react";
+import OrderDialog from "../dialog/OrderDialog";
 
-const OrderCard = ({ orderData }) => {
+import type { Order } from "@/state/API/ApiSlice";
+
+type Props = { orderData: Order };
+
+const OrderCard = ({ orderData }: Props) => {
+  console.log("Order Data in OrderCard:", orderData);
   const names = orderData.product.seller.name.split(" ");
 
   // 2. Initialize a variable for the initials
@@ -27,7 +32,7 @@ const OrderCard = ({ orderData }) => {
           ? "border-b-6 border-b-orange-500"
           : orderData.status === "delivering"
           ? "border-b-6 border-b-blue-500"
-          : orderData.status === "delivered"
+          : orderData.status === "sold"
           ? "border-b-6 border-b-green-500"
           : "border-b-6 border-b-red-500"
       }`}
@@ -68,9 +73,7 @@ const OrderCard = ({ orderData }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-black text-white font-bold cursor-pointer p-3 rounded-full">
-          <ChevronRight />
-        </div>
+        <OrderDialog orderData={orderData} />
       </div>
     </div>
   );
