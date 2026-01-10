@@ -7,13 +7,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class OrderService {
   constructor(private prisma: PrismaService) { }
   async create(createOrderDto: CreateOrderDto[], buyerId: number) {
-    console.log(createOrderDto)
-if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
-      throw new BadRequestException('No order items provided');
-    }
+  if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
+    throw new BadRequestException('No order items provided');
+  }
 
-    // build create operations for each cart item
-    const ops = createOrderDto.map((item) =>
+  const ops = createOrderDto.flatMap((item) => {
+    if (item.productQuantity < item.quantity) {
+      throw new BadRequestException('Insufficient product quantity');
+    }
+    return [
+      this.prisma.product.update({
+        where: { id: item.productId },
+        data: { quantity: item.productQuantity - item.quantity },
+      }),
       this.prisma.order.create({
         data: {
           productId: item.productId,
@@ -22,12 +28,11 @@ if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
           buyerId: Number(buyerId),
         },
       }),
-    );
+    ];
+  });
 
-    // run all creates in a single transaction
-    const created = await this.prisma.$transaction(ops);
-    return created;
-  }
+  return this.prisma.$transaction(ops);
+}
 
   // get all orders
   async findAll() {
@@ -225,13 +230,38 @@ if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
 
   // change order status
   async updateStatus(id: number,  updateOrderStatusDto: UpdateOrderDto) {
-    return await this.prisma.order.update({
-      where: { id },
-      data: {
-        status: updateOrderStatusDto.status
+    if(updateOrderStatusDto.status === "accepted"){
+      const orderInfo = (await this.prisma.order.findUnique({
+        where: { id },
+        select: { productId: true, quantity: true }
+      }));
+      const productId = orderInfo?.productId;
+      const orderQuantity = orderInfo?.quantity;
+      
+      const productInfo = (await this.prisma.product.findUnique({
+        where: { id: productId! },
+        select: { quantity: true }
+      }));
+
+      const productQuantity = productInfo?.quantity;
+
+      if(!productQuantity || !orderQuantity || productQuantity - orderQuantity < 0){
+        throw new ConflictException("Insufficient product quantity to accept the order");
       }
-    })
-  }
+      
+        const product = await this.prisma.product.update({
+          where: { id: productId },
+          data: { quantity: productQuantity - orderQuantity! }
+        });
+    
+      }
+      return await this.prisma.order.update({
+        where: { id },
+        data: {
+          status: updateOrderStatusDto.status
+        }
+      })
+}
 
   // cancel order only used by admins
   async remove(id: number) {
