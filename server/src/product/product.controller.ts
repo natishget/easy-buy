@@ -36,12 +36,21 @@ export class ProductController {
     return this.productService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('getSellerProducts')
+  findBySellerId(@Req() req: Request & { user?: any }) {
+    const sellerId = (req.user && ((req.user.userId as number) || (req.user.sub as any) || req.user.id)) as number;
+    return this.productService.findBySellerId(sellerId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }
 
 
+  @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);

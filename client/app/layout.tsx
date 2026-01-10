@@ -4,6 +4,9 @@ import "./globals.css";
 import ReduxProvider from "@/state/provider";
 import Nav from "@/compoenents/nav&foot/Nav";
 
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,8 +33,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
       >
         <ReduxProvider>
-          <Nav />
-          {children}
+          <Theme>
+            <Nav />
+            {children}
+          </Theme>
         </ReduxProvider>
       </body>
     </html>

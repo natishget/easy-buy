@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 // redux
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { protectedRouteAsync } from "@/state/API/ApiSlice";
+import { logoutAsync, protectedRouteAsync } from "@/state/API/ApiSlice";
 
 interface User {
   UserId: string;
@@ -27,6 +27,12 @@ const Nav = () => {
   const { user, loading, initialized } = useSelector(
     (state: RootState) => state.api
   );
+  const cartProducts = useSelector((state: RootState) => state.cart.items);
+
+  const handleLogout = async () => {
+    // Implement logout functionality here
+    await dispatch(logoutAsync());
+  };
 
   useEffect(() => {
     dispatch(protectedRouteAsync());
@@ -86,6 +92,15 @@ const Nav = () => {
         </Link>
 
         <Link
+          href="/product"
+          className={`hover:text-[rgb(56,177,151)] ${
+            user?.isSeller ? "" : "hidden"
+          } ${location === "/product" && "text-[rgb(56,177,151)]"}`}
+        >
+          My Products
+        </Link>
+
+        <Link
           href={`${user?.isSeller ? "/order/seller" : "/order/buyer"}`}
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/order/seller" || location === "/order/buyer"
@@ -94,15 +109,6 @@ const Nav = () => {
           }`}
         >
           My Orders
-        </Link>
-
-        <Link
-          href="/add-product"
-          className={`hover:text-[rgb(56,177,151)] ${
-            user?.isSeller ? "" : "hidden"
-          } ${location === "/add-product" && "text-[rgb(56,177,151)]"}`}
-        >
-          Add Product
         </Link>
 
         <Link
@@ -115,19 +121,46 @@ const Nav = () => {
         </Link>
         <Link
           href="/cart"
-          className={`hover:text-[rgb(56,177,151)] ${
+          className={`hover:text-[rgb(56,177,151)] relative ${
             user?.isSeller ? "hidden" : ""
           } ${location === "/cart" && "text-[rgb(56,177,151)]"}`}
         >
+          <div
+            className={`absolute w-5 h-5 rounded-full bg-red-600 text-white text-xs flex justify-center items-center bottom-4 -right-4 ${
+              cartProducts.length === 0 && "hidden"
+            }`}
+          >
+            {cartProducts.length}
+          </div>
           <ShoppingCart />
         </Link>
         <Link
-          href="/cart"
+          href="/profile"
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/profile" && "text-[rgb(56,177,151)]"
           }`}
         >
-          <CircleUserRound />
+          <div className="relative flex flex-col">
+            <CircleUserRound />
+            <div className="absolute flex flex-col mt-4 w-56  bg-white border border-gray-300 p-4 text-black hover:text-black rounded shadow-lg opacity-0 hover:opacity-100 transition-opacity left-[-800%] ">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-teal-600 flex justify-center items-center border border-teal-600 text-white text-semibold rounded-full">
+                  {user?.name.charAt(0)}
+                </div>
+                <p>{user?.name}</p>
+              </div>
+              <div className=" border border-gray-600 "></div>
+              <button
+                className="bg-gray-900 hover:bg-gray-700 text-white py-2 px-5 mt-3"
+                onClick={() => {
+                  handleLogout();
+                  // router.push("/login");
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </Link>
       </div>
     </nav>

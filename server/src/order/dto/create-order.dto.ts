@@ -11,6 +11,9 @@ export class CreateOrderDto {
     @IsNotEmpty()
     productId!: number
 
+    @IsNotEmpty()
+    productQuantity!: number
+
     // @IsNotEmpty()
     // buyerId!: number
 }

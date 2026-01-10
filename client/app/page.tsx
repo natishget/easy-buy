@@ -38,11 +38,11 @@ export default function Home() {
     dispatch(protectedRouteAsync());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (initialized && !user) {
-      router.replace("/login");
-    }
-  }, [initialized, user, router]);
+  // useEffect(() => {
+  //   if (initialized && !user) {
+  //     router.replace("/login");
+  //   }
+  // }, [initialized, user, router]);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -68,8 +68,12 @@ export default function Home() {
     );
 
   if (user?.isSeller) {
-    router.replace("/order/seller");
+    router.replace("/product");
   }
+
+  // if (initialized && !user && !loading) {
+  //   router.replace("/login");
+  // }
 
   return (
     <div className="h-fit w-screen bg-gray-150">

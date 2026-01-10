@@ -19,9 +19,11 @@ export default function BuyerOrderPage() {
     dispatch(protectedRouteAsync());
   }, [dispatch]);
 
-  if (user?.isSeller === true) {
-    router.replace("/order/seller");
-  }
+  useEffect(() => {
+    if (user?.isSeller === true) {
+      router.replace("/order/seller");
+    }
+  }, [initialized, user, router]);
 
   return (
     <div className="p-10">
