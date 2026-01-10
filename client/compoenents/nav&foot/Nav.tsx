@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 // redux
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
-import { protectedRouteAsync } from "@/state/API/ApiSlice";
+import { logoutAsync, protectedRouteAsync } from "@/state/API/ApiSlice";
 
 interface User {
   UserId: string;
@@ -28,6 +28,11 @@ const Nav = () => {
     (state: RootState) => state.api
   );
   const cartProducts = useSelector((state: RootState) => state.cart.items);
+
+  const handleLogout = async () => {
+    // Implement logout functionality here
+    await dispatch(logoutAsync());
+  };
 
   useEffect(() => {
     dispatch(protectedRouteAsync());
@@ -135,7 +140,27 @@ const Nav = () => {
             location === "/profile" && "text-[rgb(56,177,151)]"
           }`}
         >
-          <CircleUserRound />
+          <div className="relative flex flex-col">
+            <CircleUserRound />
+            <div className="absolute flex flex-col mt-4 w-56  bg-white border border-gray-300 p-4 text-black hover:text-black rounded shadow-lg opacity-0 hover:opacity-100 transition-opacity left-[-800%] ">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-teal-600 flex justify-center items-center border border-teal-600 text-white text-semibold rounded-full">
+                  {user?.name.charAt(0)}
+                </div>
+                <p>{user?.name}</p>
+              </div>
+              <div className=" border border-gray-600 "></div>
+              <button
+                className="bg-gray-900 hover:bg-gray-700 text-white py-2 px-5 mt-3"
+                onClick={() => {
+                  handleLogout();
+                  // router.push("/login");
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </Link>
       </div>
     </nav>

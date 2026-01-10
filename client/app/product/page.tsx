@@ -14,8 +14,9 @@ import { AppDispatch } from "@/state/store";
 import { getSellerProducts } from "@/state/API/ApiSlice";
 
 import SellerProductCard from "@/compoenents/cards/SellerProductCard";
+import AddProductDialog from "@/compoenents/dialog/AddProductDialog";
 
-const AddProductPage = () => {
+const ProductPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -36,8 +37,11 @@ const AddProductPage = () => {
   }, []);
 
   return (
-    <div className="w-screen h-fit bg-gray-150">
-      <div className="flex flex-wrap gap-5  mt-10 mx-10">
+    <div className="w-screen h-fit bg-gray-150 p-16">
+      <div className="flex justify-end ">
+        <AddProductDialog />
+      </div>
+      <div className="flex flex-wrap gap-5  mt-10 ">
         {products.map((product) => (
           <SellerProductCard key={product.id} product={product} />
         ))}
@@ -46,4 +50,4 @@ const AddProductPage = () => {
   );
 };
 
-export default AddProductPage;
+export default ProductPage;

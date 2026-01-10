@@ -25,6 +25,16 @@ const RegisterationForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const { user, loading, initialized } = useSelector(
+    (state: RootState) => state.api
+  );
+
+  if (initialized && user?.isSeller) {
+    router.push("/product");
+  } else if (initialized && !user?.isSeller && user) {
+    router.push("/");
+  }
+
   // for zod form validation
   const {
     register,

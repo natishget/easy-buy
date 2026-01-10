@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validationSchema";
@@ -24,7 +24,18 @@ const LoginForm = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
+  const [isSeller, setIsSeller] = useState(0);
   const router = useRouter();
+
+  const { user, loading, initialized } = useSelector(
+    (state: RootState) => state.api
+  );
+
+  if (initialized && user?.isSeller) {
+    router.push("/product");
+  } else if (initialized && !user?.isSeller && user) {
+    router.push("/");
+  }
 
   // for zod validation
   const {
@@ -39,13 +50,21 @@ const LoginForm = () => {
     setIsLoading(true);
     try {
       const response = await dispatch(loginAsync(data)).unwrap();
-      router.push("/");
+      setIsSeller(response?.isSeller ? 1 : 2);
     } catch (error: any) {
       setError(error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    console.log("isSeller value:", isSeller);
+    isSeller === 1
+      ? router.push("/product")
+      : isSeller === 2 && router.push("/");
+  }, [isSeller, router]);
+
   return (
     <div className="w-full">
       <form

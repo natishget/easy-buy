@@ -32,6 +32,7 @@ interface LoginResponse {
     message?: string;
     error?: string;
     access_token?: string;
+    isSeller?: boolean;
 }
 
 export interface Product {
@@ -121,6 +122,19 @@ export const loginAsync = createAsyncThunk<
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Login failed");
     }
+});
+
+export const logoutAsync = createAsyncThunk<
+  void,
+  void,
+  { rejectValue: string }
+>("logoutAsync", async (_, { rejectWithValue, dispatch }) => {
+  try {
+    await api.post("/auth/logout", { withCredentials: true });
+    dispatch(clearUser()); // clear user immediately
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || "Logout failed");
+  }
 });
 
 export const registerAsync = createAsyncThunk<
@@ -305,6 +319,21 @@ const ApiSlice = createSlice({
                 state.loginResponse = action.payload;
             })
             .addCase(loginAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            .addCase(logoutAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(logoutAsync.fulfilled, (state) => {
+                state.loading = false;
+                state.user = null;
+                state.initialized = true;
+                
+            })
+            .addCase(logoutAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
             })

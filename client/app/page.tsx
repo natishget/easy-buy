@@ -71,9 +71,9 @@ export default function Home() {
     router.replace("/product");
   }
 
-  if (initialized && !user) {
-    router.replace("/login");
-  }
+  // if (initialized && !user && !loading) {
+  //   router.replace("/login");
+  // }
 
   return (
     <div className="h-fit w-screen bg-gray-150">
