@@ -44,8 +44,6 @@ export class AuthService {
 
     async loginUser(dto: LoginUserDto){
 
-        console.log("on login service")
-
         const existingUser = await this.prisma.user.findUnique({
             where: { email: dto.email},
             select: {
@@ -70,6 +68,7 @@ export class AuthService {
 
         const token = this.jwtService.sign({ userId: existingUser.id, email: existingUser.email, phone: existingUser.phone, name: existingUser.name, isSeller: existingUser.isSeller})
         return {
+            isSeller: existingUser.isSeller,
             message: "Login Sucessful",
             access_token: token
         };

@@ -20,7 +20,7 @@ export class AuthController {
 
     @Post('login')
     async login(@Body() dto: LoginUserDto, @Res({ passthrough: true }) res: Response) {
-        const { access_token, message } = await this.authService.loginUser(dto);
+        const { access_token, isSeller } = await this.authService.loginUser(dto);
         // set cookie for clients that support it
         res.cookie('access_token', access_token, {
             httpOnly: true,
@@ -28,7 +28,7 @@ export class AuthController {
             sameSite: process.env.IS_PRODUCTION === 'true' ? 'none' : 'lax',     // 'none' needed for cross-site XHR; production requires secure:true
             maxAge: 24 * 60 * 60 * 1000,
         });
-        return { message, access_token };
+        return { isSeller };
     }
 
     @UseGuards(JwtAuthGuard)
@@ -36,5 +36,12 @@ export class AuthController {
     getMe(@Req() req: AuthenticatedRequest) {
         console.log('User:', req.user);
         return req.user;
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('logout')
+    logout(@Res({ passthrough: true }) res: Response) {
+        res.clearCookie('access_token');
+        return { message: 'Logged out successfully' };
     }
 }
