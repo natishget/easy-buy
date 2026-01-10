@@ -1,12 +1,13 @@
 import React from "react";
 // import * as Dialog from "@radix-ui/react-dialog";
-import { Button, Text, Flex, TextField, Dialog } from "@radix-ui/themes";
+import { Dialog } from "@radix-ui/themes";
 
 import { ChevronRight } from "lucide-react";
 
 import type { Order } from "@/state/API/ApiSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { useDispatch, useSelector } from "react-redux";
+import { updateOrderStatusAsync } from "@/state/API/ApiSlice";
 
 type Props = { orderData: Order };
 
@@ -16,6 +17,18 @@ const OrderDialog = ({ orderData }: Props) => {
   const { user, loading, initialized } = useSelector(
     (state: RootState) => state.api
   );
+
+  const handleStatusUpdate = async (newStatus: string) => {
+    console.log("Updating status to:", newStatus);
+    try {
+      await dispatch(
+        updateOrderStatusAsync({ orderId: orderData.id, status: newStatus })
+      ).unwrap();
+      // Optionally, you can add some feedback to the user here
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+    }
+  };
   return (
     <Dialog.Root>
       <Dialog.Trigger>
@@ -52,8 +65,10 @@ const OrderDialog = ({ orderData }: Props) => {
             <label htmlFor="" className="mb-2 font-bold ">
               Status:{" "}
               <span
-                className={`text-teal-600 ${
-                  orderData.status === "cancelled" && "text-red-600"
+                className={` ${
+                  orderData.status === "cancelled"
+                    ? "text-red-800"
+                    : "text-teal-600"
                 } `}
               >
                 {orderData.status}
@@ -76,20 +91,32 @@ const OrderDialog = ({ orderData }: Props) => {
           <div className="flex flex-col gap-3">
             <div className="w-[80%] border-gray-700 border my-5"></div>
             <label htmlFor="product-information" className="text-xl font-bold">
-              Buyer Information
+              {user?.isSeller ? "Buyer Information" : "Seller Information"}
             </label>
 
             <label className="mb-2 font-bold ">
-              Buyer Name:{" "}
-              <span className="text-gray-600">{orderData.buyer.name}</span>
+              {user?.isSeller ? "Buyer Name:" : "Seller Name:"}{" "}
+              <span className="text-gray-600">
+                {user?.isSeller
+                  ? orderData.buyer.name
+                  : orderData.product.seller.name}
+              </span>
             </label>
             <label className="mb-2 font-bold ">
               Phone:{" "}
-              <span className="text-gray-600">{orderData.buyer.phone}</span>
+              <span className="text-gray-600">
+                {user?.isSeller
+                  ? orderData.buyer.phone
+                  : orderData.product.seller.phone}
+              </span>
             </label>
             <label htmlFor="" className="mb-2 font-bold ">
               Email:{" "}
-              <span className="text-gray-600">{orderData.buyer.email}</span>
+              <span className="text-gray-600">
+                {user?.isSeller
+                  ? orderData.buyer.email
+                  : orderData.product.seller.email}
+              </span>
             </label>
           </div>
         </div>
@@ -100,21 +127,52 @@ const OrderDialog = ({ orderData }: Props) => {
             orderData.status === "pending" ? (
               <div className="flex gap-5">
                 {" "}
-                <button className="bg-teal-600 py-2 px-4 rounded text-white font-bold">
+                <button
+                  className="bg-teal-600 py-2 px-4 rounded text-white font-bold"
+                  onClick={() => handleStatusUpdate("accepted")}
+                >
                   Accept Order
                 </button>{" "}
-                <button className="bg-red-600 py-2 px-4 rounded text-white font-bold">
+                <button
+                  className="bg-red-600 py-2 px-4 rounded text-white font-bold"
+                  onClick={() => handleStatusUpdate("cancelled")}
+                >
                   {" "}
                   Reject Order
                 </button>
               </div>
             ) : orderData.status === "paid" ? (
-              <button>Ship Order</button>
+              <button
+                className="bg-teal-600 py-2 px-4 rounded text-white font-bold"
+                onClick={() => handleStatusUpdate("delivering")}
+              >
+                Ship Order
+              </button>
             ) : null
+          ) : orderData.status === "pending" ? (
+            <div className="flex gap-5">
+              <button
+                className="bg-red-600 py-2 px-4 rounded text-white font-bold"
+                onClick={() => handleStatusUpdate("cancelled")}
+              >
+                {" "}
+                Reject Order
+              </button>
+            </div>
+          ) : orderData.status === "accepted" ? (
+            <button
+              className="bg-teal-600 py-2 px-4 rounded text-white font-bold"
+              onClick={() => handleStatusUpdate("paid")}
+            >
+              Make Payment
+            </button>
           ) : (
-            orderData.status === "waiting" && (
-              <button className="bg-teal-600 py-2 px-4 rounded text-white font-bold">
-                Make Payment
+            orderData.status === "delivering" && (
+              <button
+                className="bg-teal-600 py-2 px-4 rounded text-white font-bold"
+                onClick={() => handleStatusUpdate("sold")}
+              >
+                Confirm Delivery
               </button>
             )
           )}

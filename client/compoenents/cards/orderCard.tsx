@@ -8,7 +8,6 @@ import type { Order } from "@/state/API/ApiSlice";
 type Props = { orderData: Order };
 
 const OrderCard = ({ orderData }: Props) => {
-  console.log("Order Data in OrderCard:", orderData);
   const names = orderData.product.seller.name.split(" ");
 
   // 2. Initialize a variable for the initials
@@ -34,7 +33,7 @@ const OrderCard = ({ orderData }: Props) => {
           ? "border-b-6 border-b-blue-500"
           : orderData.status === "sold"
           ? "border-b-6 border-b-green-500"
-          : "border-b-6 border-b-red-500"
+          : "border-b-6 border-b-red-600"
       }`}
     >
       <div className="flex gap-3 mt-5 mb-8 text-gray-600 text-xl">

@@ -34,7 +34,7 @@ interface LoginResponse {
     access_token?: string;
 }
 
-interface Product {
+export interface Product {
     id: number;
     title: string;
     description: string;
@@ -184,6 +184,19 @@ export const addProductAsync = createAsyncThunk<
     }
 });
 
+export const getSellerProducts = createAsyncThunk<
+    Product[],
+    void,
+    { rejectValue: string }
+>("getSellerProducts", async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get("/product/getSellerProducts", { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to get seller products");
+    }
+});
+
 export const createOrderAsync = createAsyncThunk<
     CreateOrder,
     object,
@@ -221,6 +234,19 @@ export const getSellerOrdersAsync = createAsyncThunk<
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Failed to get seller orders");
+    }
+});
+
+export const updateOrderStatusAsync = createAsyncThunk<
+    {orderId: number; status: string},
+    {orderId: number; status: string},
+    { rejectValue: string }
+>("updateOrderStatusAsync", async (data, { rejectWithValue }) => {
+    try {
+        await api.put(`/order/updateStatus/${data.orderId}`, { status: data.status }, { withCredentials: true });
+        return { orderId: data.orderId, status: data.status };
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to update order status");
     }
 });
 
@@ -313,6 +339,19 @@ const ApiSlice = createSlice({
                 state.error = action.payload || action.error.message || "something went wrong";
             })
 
+            .addCase(getSellerProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSellerProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.Product = action.payload;
+            })
+            .addCase(getSellerProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
             // create order
             .addCase(createOrderAsync.pending, (state) =>{
                 state.loading = true;
@@ -351,6 +390,31 @@ const ApiSlice = createSlice({
                 state.SellerOrder = action.payload;
             })
             .addCase(getSellerOrdersAsync.rejected, (state, action) =>{
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            .addCase(updateOrderStatusAsync.pending, (state) =>{
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateOrderStatusAsync.fulfilled, (state, action) =>{
+                state.loading = false;
+                const { orderId, status } = action.payload;
+                // Update status in BuyerOrder
+                const buyerOrder = state.BuyerOrder.find(order => order.id === orderId);
+                console.log("Buyer order to update:", buyerOrder);
+                if (buyerOrder) {
+                    buyerOrder.status = status;
+                }
+                // Update status in SellerOrder
+                const sellerOrder = state.SellerOrder.find(order => order.id === orderId);
+                console.log("Seller order to update:", sellerOrder);
+                if (sellerOrder) {
+                    sellerOrder.status = status;
+                }
+            })
+            .addCase(updateOrderStatusAsync.rejected, (state, action) =>{
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
             });

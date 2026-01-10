@@ -27,6 +27,7 @@ const Nav = () => {
   const { user, loading, initialized } = useSelector(
     (state: RootState) => state.api
   );
+  const cartProducts = useSelector((state: RootState) => state.cart.items);
 
   useEffect(() => {
     dispatch(protectedRouteAsync());
@@ -86,6 +87,15 @@ const Nav = () => {
         </Link>
 
         <Link
+          href="/product"
+          className={`hover:text-[rgb(56,177,151)] ${
+            user?.isSeller ? "" : "hidden"
+          } ${location === "/product" && "text-[rgb(56,177,151)]"}`}
+        >
+          My Products
+        </Link>
+
+        <Link
           href={`${user?.isSeller ? "/order/seller" : "/order/buyer"}`}
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/order/seller" || location === "/order/buyer"
@@ -94,15 +104,6 @@ const Nav = () => {
           }`}
         >
           My Orders
-        </Link>
-
-        <Link
-          href="/add-product"
-          className={`hover:text-[rgb(56,177,151)] ${
-            user?.isSeller ? "" : "hidden"
-          } ${location === "/add-product" && "text-[rgb(56,177,151)]"}`}
-        >
-          Add Product
         </Link>
 
         <Link
@@ -115,14 +116,21 @@ const Nav = () => {
         </Link>
         <Link
           href="/cart"
-          className={`hover:text-[rgb(56,177,151)] ${
+          className={`hover:text-[rgb(56,177,151)] relative ${
             user?.isSeller ? "hidden" : ""
           } ${location === "/cart" && "text-[rgb(56,177,151)]"}`}
         >
+          <div
+            className={`absolute w-5 h-5 rounded-full bg-red-600 text-white text-xs flex justify-center items-center bottom-4 -right-4 ${
+              cartProducts.length === 0 && "hidden"
+            }`}
+          >
+            {cartProducts.length}
+          </div>
           <ShoppingCart />
         </Link>
         <Link
-          href="/cart"
+          href="/profile"
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/profile" && "text-[rgb(56,177,151)]"
           }`}
