@@ -4,6 +4,8 @@ import Image from "next/image";
 import { Product } from "@/state/API/ApiSlice";
 
 import { Pencil, Trash2 } from "lucide-react";
+import EditProductDialog from "../dialog/EditProductDialog";
+import ProductDeleteAlertDialog from "../dialog/ProductDeleteAlertDialog";
 
 const SellerProductCard = ({ product }: { product: Product }) => {
   return (
@@ -43,10 +45,10 @@ const SellerProductCard = ({ product }: { product: Product }) => {
         </p>
         <div className="flex justify-end m-3 gap-4 text-xs">
           <button className="px-2 py-2 text-white font-bold bg-[rgb(56,177,151)] rounded ">
-            <Pencil />
+            <EditProductDialog product={product} />
           </button>
           <button className="px-2 py-2 text-white font-bold bg-red-700 rounded">
-            <Trash2 />
+            <ProductDeleteAlertDialog productId={product.id} />
           </button>
         </div>
       </div>

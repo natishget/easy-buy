@@ -86,6 +86,7 @@ interface CreateOrder {
     productId: number;
     totalPrice: number;
     quantity: number;
+    productQuantity: number;
 }
 
 const initialState: ApiState = {
@@ -181,6 +182,34 @@ export const addProductAsync = createAsyncThunk<
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Add product failed");
+    }
+});
+
+export const editProductAsync = createAsyncThunk<
+    {product: Product, id: number},
+    {product: Product, id: number},
+    { rejectValue: string }
+>("editProductAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.patch(`/product/update/${data.id}`, data.product,
+             { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Edit product failed");
+    }
+});
+
+export const deleteProductAsync = createAsyncThunk<
+    {id: number},
+    {id: number},
+    { rejectValue: string }
+>("deleteProductAsync", async (data, { rejectWithValue }) => {
+    try {
+        const response = await api.delete(`/product/delete/${data.id}`,
+             { withCredentials: true });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Delete product failed");
     }
 });
 
@@ -335,6 +364,35 @@ const ApiSlice = createSlice({
                 state.Product.push(action.payload);
             })
             .addCase(addProductAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            //edit product
+            .addCase(editProductAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(editProductAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                const { id, product } = action.payload;
+            })
+            .addCase(editProductAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
+            })
+
+            // delete product 
+            .addCase(deleteProductAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteProductAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                const { id } = action.payload;
+                state.Product = state.Product.filter(product => product.id !== id);
+            })
+            .addCase(deleteProductAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
             })

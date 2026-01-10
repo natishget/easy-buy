@@ -21,6 +21,7 @@ const Receipt = () => {
           productId: item.product.id,
           quantity: item.cartQuantity,
           totalPrice: item.product.price * item.cartQuantity,
+          productQuantity: item.product.quantity,
         })),
       };
       const response = await dispatch(createOrderAsync(data.items)).unwrap();
