@@ -55,6 +55,12 @@ export class ProductService {
     return productExist
   }
 
+  async findBySellerId(sellerId: number) {
+    return await this.prisma.product.findMany({
+      where: { sellerId }
+    })
+  }
+
   async update(id: number, updateProductDto: UpdateProductDto) {
     const productExist = await this.prisma.product.findUnique({
       where: { id }
