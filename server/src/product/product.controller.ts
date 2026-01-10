@@ -50,6 +50,7 @@ export class ProductController {
   }
 
 
+  @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
