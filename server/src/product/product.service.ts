@@ -62,25 +62,30 @@ export class ProductService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
+    console.log("updating product", updateProductDto)
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
     if (!productExist)
       throw new NotFoundException(" Product Doesn't exist");
 
-    return await this.prisma.product.update({
+    const response =  await this.prisma.product.update({
       data: {
         title: updateProductDto.title,
         quantity: updateProductDto.quantity,
         price: updateProductDto.price,
         description: updateProductDto.description,
         category: updateProductDto.category,
+        imageUrl: updateProductDto.imageUrl,
       },
       where: { id }
     })
+
+    console.log("update response", response)
   }
 
   async remove(id: number) {
+    console.log("deleting product", id)
     const productExist = await this.prisma.product.findUnique({
       where: { id }
     })
