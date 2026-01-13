@@ -69,7 +69,7 @@ export class ProductService {
     if (!productExist)
       throw new NotFoundException(" Product Doesn't exist");
 
-    const response =  await this.prisma.product.update({
+    return await this.prisma.product.update({
       data: {
         title: updateProductDto.title,
         quantity: updateProductDto.quantity,
@@ -81,7 +81,7 @@ export class ProductService {
       where: { id }
     })
 
-    console.log("update response", response)
+    
   }
 
   async remove(id: number) {
