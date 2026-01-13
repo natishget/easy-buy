@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addProductSchema } from "@/lib/validationSchema";
 
-import { z } from "zod";
+import { set, z } from "zod";
 import Image from "next/image";
 import Loading from "@/assests/icons/loading.png";
 
@@ -18,6 +18,7 @@ import { Dialog } from "@radix-ui/themes";
 type ProductForm = z.infer<typeof addProductSchema>;
 
 const AddProductDialog = () => {
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -28,7 +29,7 @@ const AddProductDialog = () => {
     try {
       const response = await dispatch(addProductAsync(data)).unwrap();
       console.log("response on form", response);
-      // router.push("/login");
+      setOpen(false);
     } catch (err: unknown) {
       console.log("from form", err);
       // setError(getErrorMessage(err));
@@ -46,7 +47,7 @@ const AddProductDialog = () => {
   });
 
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
         <button className="flex items-center gap-2 bg-black text-white font-bold cursor-pointer p-3 rounded">
           Add Product
