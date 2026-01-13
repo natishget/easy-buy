@@ -4,13 +4,13 @@ import React from "react";
 // import { AppDispatch } from "@/state/store";
 // import { protectedRouteAsync } from "@/state/API/ApiSlice";
 
-interface User {
-  userId: string;
-  name: string;
-  email: string;
-  phone?: number;
-  isSeller?: boolean;
-}
+// interface User {
+//   userId: string;
+//   name: string;
+//   email: string;
+//   phone?: number;
+//   isSeller?: boolean;
+// }
 
 const Page = () => {
   // const dispatch = useDispatch<AppDispatch>();

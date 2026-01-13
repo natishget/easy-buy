@@ -1,7 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
-import { Product } from "@/state/API/ApiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
 import { getSellerProducts } from "@/state/API/ApiSlice";
@@ -11,7 +10,7 @@ import AddProductDialog from "@/compoenents/dialog/AddProductDialog";
 
 const ProductPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { Product, loading } = useSelector((state: RootState) => state.api);
+  const { Product } = useSelector((state: RootState) => state.api);
 
   useEffect(() => {
     dispatch(getSellerProducts());

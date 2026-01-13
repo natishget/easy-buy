@@ -11,9 +11,7 @@ import { protectedRouteAsync } from "@/state/API/ApiSlice";
 export default function BuyerOrderPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { user, loading, initialized } = useSelector(
-    (state: RootState) => state.api
-  );
+  const { user, initialized } = useSelector((state: RootState) => state.api);
 
   useEffect(() => {
     dispatch(protectedRouteAsync());

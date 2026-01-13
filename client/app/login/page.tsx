@@ -1,7 +1,6 @@
 import Link from "next/link";
 import LoginForm from "@/compoenents/forms/LoginForm";
-import { RootState } from "@/state/store";
-import { useSelector } from "react-redux";
+
 const Page = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center bg-gray-100">

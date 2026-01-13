@@ -9,12 +9,10 @@ import { createOrderAsync } from "@/state/API/ApiSlice";
 import { makeEmpty } from "@/state/cart/cartSlice";
 
 const Receipt = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const cartProducts = useSelector((state: RootState) => state.cart.items);
 
   const handleClick = async () => {
-    setIsLoading(true);
     try {
       const data = {
         items: cartProducts.map((item) => ({
@@ -24,14 +22,12 @@ const Receipt = () => {
           productQuantity: item.product.quantity,
         })),
       };
-      const response = await dispatch(createOrderAsync(data.items)).unwrap();
+      await dispatch(createOrderAsync(data.items)).unwrap();
       dispatch(makeEmpty());
       alert("success");
     } catch (error) {
       console.log(error);
       alert("error please check console");
-    } finally {
-      setIsLoading(false);
     }
   };
   return (
