@@ -10,7 +10,7 @@ import ProductDeleteAlertDialog from "../dialog/ProductDeleteAlertDialog";
 const SellerProductCard = ({ product }: { product: Product }) => {
   return (
     <div
-      className="border border-gray-100 bg-white w-fit shadow-2xl rounded-xl text-lg text-gray-800"
+      className="border border-gray-100 bg-white w-[300px] shadow-2xl rounded-xl text-lg text-gray-800"
       key={product.id}
     >
       <div>

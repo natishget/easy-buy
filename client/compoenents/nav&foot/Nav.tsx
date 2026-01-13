@@ -23,6 +23,10 @@ const Nav = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [location, setLocation] = useState(pathname);
+  const [isClicked, setIsClicked] = useState(false);
+  const handleProfileButton = () => {
+    setIsClicked(!isClicked);
+  };
 
   const { user, loading, initialized } = useSelector(
     (state: RootState) => state.api
@@ -135,14 +139,20 @@ const Nav = () => {
           <ShoppingCart />
         </Link>
         <Link
-          href="/profile"
+          href=""
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/profile" && "text-[rgb(56,177,151)]"
           }`}
         >
           <div className="relative flex flex-col">
-            <CircleUserRound />
-            <div className="absolute flex flex-col mt-4 w-56  bg-white border border-gray-300 p-4 text-black hover:text-black rounded shadow-lg opacity-0 hover:opacity-100 transition-opacity left-[-800%] ">
+            <button className="" onClick={handleProfileButton}>
+              <CircleUserRound />
+            </button>
+            <div
+              className={`absolute flex flex-col mt-4 w-56  bg-white border border-gray-300 p-4 text-black text-black rounded shadow-lg transition-opacity left-[-570%] top-[50] ${
+                isClicked ? " " : "hidden"
+              }`}
+            >
               <div className="flex items-center justify-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-teal-600 flex justify-center items-center border border-teal-600 text-white text-semibold rounded-full">
                   {user?.name.charAt(0)}

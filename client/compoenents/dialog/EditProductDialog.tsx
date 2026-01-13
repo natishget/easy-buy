@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { Product } from "@/state/API/ApiSlice";
 import { editProductAsync } from "@/state/API/ApiSlice";
 
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -18,6 +18,7 @@ import { addProductSchema } from "@/lib/validationSchema";
 type FormValues = z.infer<typeof addProductSchema>;
 
 const EditProductDialog = ({ product }: { product: Product }) => {
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -29,7 +30,7 @@ const EditProductDialog = ({ product }: { product: Product }) => {
       const response = await dispatch(
         editProductAsync({ product: { ...product, ...data }, id: product.id })
       ).unwrap();
-      console.log("response on form", response);
+      setOpen(false);
       // router.push("/login");
     } catch (err: unknown) {
       console.log("from form", err);
@@ -59,7 +60,7 @@ const EditProductDialog = ({ product }: { product: Product }) => {
   //     reset(product); // update if prop changes
   //   }, [product, reset]);
   return (
-    <Dialog.Root>
+    <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger>
         <Pencil />
 
