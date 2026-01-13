@@ -10,9 +10,7 @@ import { useRouter } from "next/navigation";
 export default function SellerOrderPage() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const { user, loading, initialized } = useSelector(
-    (state: RootState) => state.api
-  );
+  const { user } = useSelector((state: RootState) => state.api);
 
   useEffect(() => {
     dispatch(protectedRouteAsync());
