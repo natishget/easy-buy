@@ -5,6 +5,8 @@ import ProductSearch from "../forms/ProductSearch";
 import { ShoppingCart, Bell, CircleUserRound } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { registerPush } from "@/lib/push";
+
 // redux
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/state/store";
@@ -116,7 +118,8 @@ const Nav = () => {
         </Link>
 
         <Link
-          href="/notification"
+          href=""
+          onClick={registerPush}
           className={`hover:text-[rgb(56,177,151)] ${
             location === "/notification" && "text-[rgb(56,177,151)]"
           }`}
