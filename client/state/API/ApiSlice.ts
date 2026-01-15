@@ -144,6 +144,7 @@ export const registerAsync = createAsyncThunk<
 >("registerAsync", async (data, { rejectWithValue }) => {
     try {
         const registerResponse = await api.post("/auth/register", data, { withCredentials: true });
+        console.log("api", api);
         return registerResponse.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Register failed");
