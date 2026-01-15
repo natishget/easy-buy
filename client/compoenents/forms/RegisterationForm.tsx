@@ -49,7 +49,8 @@ const RegisterationForm = () => {
     console.log("data from form", data);
     try {
       const response = await dispatch(registerAsync(data));
-      // console.log("response on form", response);
+      console.log("data sent to api", process.env.NEXT_PUBLIC_BACKEND_API);
+      console.log("response on form", response);
       router.push("/login");
     } catch (error: any) {
       console.log("from form", error);
