@@ -2,10 +2,11 @@ import { ConflictException, Injectable, NotFoundException, BadRequestException }
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private notificationService: NotificationService) { }
   async create(createOrderDto: CreateOrderDto[], buyerId: number) {
   if (!Array.isArray(createOrderDto) || createOrderDto.length === 0) {
     throw new BadRequestException('No order items provided');
@@ -229,19 +230,22 @@ export class OrderService {
   }
 
   // change order status
-  async updateStatus(id: number,  updateOrderStatusDto: UpdateOrderDto) {
+  async updateStatus(userId:number, id: number,  updateOrderStatusDto: UpdateOrderDto) {
+    let orderInfo = (await this.prisma.order.findUnique({
+      where: { id },
+      select: { productId: true, quantity: true, buyerId: true}
+    }));
+
+    const productId = orderInfo?.productId;
+    const orderQuantity = orderInfo?.quantity;
+    const buyerId = orderInfo?.buyerId;
+
+    let productInfo = (await this.prisma.product.findUnique({
+      where: { id: productId! },
+      select: { quantity: true, sellerId: true }
+    }));
     if(updateOrderStatusDto.status === "accepted"){
-      const orderInfo = (await this.prisma.order.findUnique({
-        where: { id },
-        select: { productId: true, quantity: true }
-      }));
-      const productId = orderInfo?.productId;
-      const orderQuantity = orderInfo?.quantity;
       
-      const productInfo = (await this.prisma.product.findUnique({
-        where: { id: productId! },
-        select: { quantity: true }
-      }));
 
       const productQuantity = productInfo?.quantity;
 
@@ -255,12 +259,20 @@ export class OrderService {
         });
     
       }
-      return await this.prisma.order.update({
+      const updateRespose =  await this.prisma.order.update({
         where: { id },
         data: {
           status: updateOrderStatusDto.status
         }
-      })
+      });
+
+      const notificationReciepientId = updateOrderStatusDto.status === 'accepted' || updateOrderStatusDto.status === 'delivering'  ?  orderInfo?.buyerId : productInfo?.sellerId;
+
+      await this.notificationService.sendToUser(notificationReciepientId!, {
+        title: 'Order Update',
+        body: `Your order #${id} status has changed to ${updateOrderStatusDto.status}!`,
+      });
+      return updateRespose;
 }
 
   // cancel order only used by admins

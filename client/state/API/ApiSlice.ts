@@ -171,6 +171,18 @@ export const protectedRouteAsync = createAsyncThunk<
     },
 });
 
+export const pushNotificationSubscribeAsync = createAsyncThunk<
+    void,
+    object,
+    { rejectValue: string }
+>("pushNotificationSubscribeAsync", async (subscription, { rejectWithValue }) => {
+    try {
+        await api.post("/notification/subscribe", subscription, { withCredentials: true });
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Push subscription failed");
+    }
+});
+
 export const getAllProducts = createAsyncThunk<
     Product[],
     void,
@@ -367,6 +379,19 @@ const ApiSlice = createSlice({
                 state.user = null;
                 state.error = action.payload || action.error.message || "something went wrong";
                 state.initialized = true;
+            })
+
+            //notification
+            .addCase(pushNotificationSubscribeAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(pushNotificationSubscribeAsync.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(pushNotificationSubscribeAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || action.error.message || "something went wrong";
             })
 
             // products
