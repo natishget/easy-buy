@@ -40,8 +40,20 @@ export class ProductService {
     };
   }
 
-  async findAll() {
-    return await this.prisma.product.findMany();
+  async findAll(page = 1) {
+    const take = 20;
+    const safePage = Math.max(1, Number(page || 1));
+    const skip = (safePage - 1) * take;
+    const [totalProduct, items] =  await Promise.all([
+      this.prisma.product.count(),
+      this.prisma.product.findMany({
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' }
+      })
+    ]) 
+    return { data: items, page: safePage, totalPages: Math.ceil(totalProduct / take), totalItems: totalProduct };
+    
   }
 
   async findOne(id: number) {
@@ -55,10 +67,21 @@ export class ProductService {
     return productExist
   }
 
-  async findBySellerId(sellerId: number) {
-    return await this.prisma.product.findMany({
-      where: { sellerId }
-    })
+  async findBySellerId(sellerId: number, page = 1) {
+    const take = 20;
+    const safePage = Math.max(1, Number(page || 1));
+    const skip = (safePage - 1) * take;
+    const [totalProduct, items] =  await Promise.all([
+      this.prisma.product.count({ where: { sellerId } }),
+      this.prisma.product.findMany({
+        where: { sellerId },
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' }
+        
+      })
+    ]) 
+    return { data: items, page: safePage, totalPages: Math.ceil(totalProduct / take), totalItems: totalProduct };
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
