@@ -10,10 +10,12 @@ import AddProductDialog from "@/compoenents/dialog/AddProductDialog";
 
 const ProductPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { Product } = useSelector((state: RootState) => state.api);
+  const { Product, productPageMeta } = useSelector(
+    (state: RootState) => state.api,
+  );
 
   useEffect(() => {
-    dispatch(getSellerProducts());
+    dispatch(getSellerProducts({ page: 1 }));
   }, [dispatch]);
 
   return (
@@ -25,6 +27,29 @@ const ProductPage = () => {
         {Product.map((product) => (
           <SellerProductCard key={product.id} product={product} />
         ))}
+      </div>
+      <div className="w-full flex flex-col items-center my-10">
+        <p className="mt-10 text-gray-600">
+          Total Products: {productPageMeta.totalItems}
+        </p>
+        <div className="mt-2">
+          {Array.from(
+            { length: productPageMeta.totalPages },
+            (_, i) => i + 1,
+          ).map((pageNum) => (
+            <button
+              key={pageNum}
+              onClick={() => {
+                dispatch(getSellerProducts({ page: pageNum }));
+              }}
+              className={`mx-1 px-3 py-1 border border-[rgb(56,177,151)] text-white rounded ${
+                pageNum === productPageMeta.page && "bg-[rgb(56,177,151)]"
+              }`}
+            >
+              {pageNum}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

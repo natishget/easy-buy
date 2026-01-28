@@ -1,21 +1,13 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import { decrement, increment } from "@/state/cart/cartSlice";
 import { AppDispatch, RootState } from "@/state/store";
 import { useSelector, useDispatch } from "react-redux";
 
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  quantity: number;
-  imageUrl: string;
-  category: string;
-  sellerId: number;
-  createdAt: string;
-}
+import { Product } from "@/state/API/ApiSlice";
+import ErrorAlert from "../alerts/ErrorAlert";
+import { set } from "zod";
 
 const AddToCart = ({
   product,
@@ -25,21 +17,47 @@ const AddToCart = ({
   position: string;
 }) => {
   const item = useSelector((state: RootState) =>
-    state.cart.items.find((item) => item.product.id === product.id)
+    state.cart.items.find((item) => item.product.id === product.id),
   );
+  const [showError, setShowError] = useState(false);
 
   const quantity = item ? item.cartQuantity : 0;
+
+  const handleAdd = () => {
+    if (product.quantity !== 0) {
+      dispatch(increment(product));
+    } else {
+      // show alert (state-driven)
+      setShowError(true);
+    }
+  };
+
+  const handleDecrement = () => {
+    if (product.quantity !== 0) {
+      dispatch(decrement(product));
+    } else {
+      // show alert (state-driven)
+      setShowError(true);
+    }
+  };
 
   const dispatch = useDispatch<AppDispatch>();
   return (
     <div>
       {quantity === 0 ? (
-        <button
-          onClick={() => dispatch(increment(product))}
-          className="mt-3 py-3 w-full bg-[rgb(56,177,151)] text-white font-bold rounded-xl"
-        >
-          Add to Cart
-        </button>
+        product.quantity === 0 ? (
+          <ErrorAlert
+            alertName="Out of Stock"
+            description="This product is currently out of stock."
+          />
+        ) : (
+          <button
+            onClick={handleAdd}
+            className="mt-3 py-3 w-full bg-[rgb(56,177,151)] text-white font-bold rounded-xl"
+          >
+            Add to Cart
+          </button>
+        )
       ) : (
         <div
           className={`${
@@ -52,7 +70,7 @@ const AddToCart = ({
             className={`text-2xl border px-3 hover:bg-teal-500  hover:border-teal-500 hover:text-white hover:text-bold ${
               position !== "horizontal" ? "rounded-full" : ""
             }`}
-            onClick={() => dispatch(decrement(product))}
+            onClick={handleDecrement}
           >
             -
           </button>
@@ -61,7 +79,7 @@ const AddToCart = ({
             className={`text-2xl border px-3 hover:bg-teal-500  hover:border-teal-500 hover:text-white hover:text-bold ${
               position !== "horizontal" ? "rounded-full" : ""
             }`}
-            onClick={() => dispatch(increment(product))}
+            onClick={handleAdd}
           >
             +
           </button>
