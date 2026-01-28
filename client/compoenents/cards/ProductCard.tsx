@@ -1,18 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import AddToCart from "../buttons/AddToCart";
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  quantity: number;
-  imageUrl: string;
-  category: string;
-  sellerId: number;
-  createdAt: string;
-}
+import { Product } from "@/state/API/ApiSlice";
 
 const ProductCard = ({ product }: { product: Product }) => {
   return (

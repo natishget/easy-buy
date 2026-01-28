@@ -13,6 +13,7 @@ interface ApiState {
     error: string | null;
     user: User | null;
     initialized?: boolean;
+    productPageMeta: {totalItems: number; page: number; totalPages: number;};
 }
 
 interface RegisterResponse {
@@ -34,6 +35,13 @@ interface LoginResponse {
     access_token?: string;
     isSeller?: boolean;
 }
+
+export interface PaginatedProductResponse {
+    data: Product[];
+    totalItems: number;
+    page: number;
+    totalPages: number;
+} 
 
 export interface Product {
     id: number;
@@ -105,6 +113,7 @@ const initialState: ApiState = {
     error: null,
     user: null,
     initialized: false,
+    productPageMeta: {totalItems: 0, page: 0, totalPages: 0},
 };
 
 // Login: send credentials, server sets cookie and returns token/message.
@@ -185,12 +194,12 @@ export const pushNotificationSubscribeAsync = createAsyncThunk<
 });
 
 export const getAllProducts = createAsyncThunk<
-    Product[],
-    void,
+    PaginatedProductResponse,
+    {page?: number},
     { rejectValue: string }
->("getAllProducts", async (_, { rejectWithValue }) => {
+>("getAllProducts", async ({ page }, { rejectWithValue }) => {
     try {
-        const response = await api.get("/product/get");
+        const response = await api.get("/product/get", { params: {page}});
         return response.data;
     } catch (error: any) {
         console.log("error trying to get all product in slice", error);
@@ -241,12 +250,12 @@ export const deleteProductAsync = createAsyncThunk<
 });
 
 export const getSellerProducts = createAsyncThunk<
-    Product[],
-    void,
+    PaginatedProductResponse,
+    {page?: number},
     { rejectValue: string }
->("getSellerProducts", async (_, { rejectWithValue }) => {
+>("getSellerProducts", async ({ page }, { rejectWithValue }) => {
     try {
-        const response = await api.get("/product/getSellerProducts", { withCredentials: true });
+        const response = await api.get("/product/getSellerProducts", { params: {page}, withCredentials: true });
         return response.data;
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Failed to get seller products");
@@ -402,7 +411,8 @@ const ApiSlice = createSlice({
             })
             .addCase(getAllProducts.fulfilled, (state, action) => {
                 state.loading = false;
-                state.Product = action.payload;
+                state.Product = action.payload.data;
+                state.productPageMeta = {totalItems: action.payload.totalItems, page: action.payload.page, totalPages: action.payload.totalPages};
             })
             .addCase(getAllProducts.rejected, (state, action) => {
                 state.loading = false;
@@ -459,7 +469,8 @@ const ApiSlice = createSlice({
             })
             .addCase(getSellerProducts.fulfilled, (state, action) => {
                 state.loading = false;
-                state.Product = action.payload;
+                state.Product = action.payload.data;
+                state.productPageMeta = {totalItems: action.payload.totalItems, page: action.payload.page, totalPages: action.payload.totalPages};
             })
             .addCase(getSellerProducts.rejected, (state, action) => {
                 state.loading = false;

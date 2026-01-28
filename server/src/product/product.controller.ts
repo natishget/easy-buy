@@ -25,9 +25,8 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Get('get')
-  findAll() {
-    console.log("called");
-    return this.productService.findAll();
+  findAll(@Param('page') page: number) {
+    return this.productService.findAll(page);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -38,9 +37,9 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard)
   @Get('getSellerProducts')
-  findBySellerId(@Req() req: Request & { user?: any }) {
+  findBySellerId(@Req() req: Request & { user?: any }, @Param('page') page: number) {
     const sellerId = (req.user && ((req.user.userId as number) || (req.user.sub as any) || req.user.id)) as number;
-    return this.productService.findBySellerId(sellerId);
+    return this.productService.findBySellerId(sellerId, page);
   }
 
   @UseGuards(JwtAuthGuard)
