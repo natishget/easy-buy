@@ -303,13 +303,13 @@ export const getSellerOrdersAsync = createAsyncThunk<
 });
 
 export const updateOrderStatusAsync = createAsyncThunk<
-    {orderId: number; status: string},
-    {orderId: number; status: string},
+    { orderId: number; status: string; updatedOrder?: Order },
+    { orderId: number; status: string },
     { rejectValue: string }
 >("updateOrderStatusAsync", async (data, { rejectWithValue }) => {
     try {
-        await api.put(`/order/updateStatus/${data.orderId}`, { status: data.status }, { withCredentials: true });
-        return { orderId: data.orderId, status: data.status };
+        const response = await api.put(`/order/updateStatus/${data.orderId}`, { status: data.status }, { withCredentials: true });
+        return { orderId: data.orderId, status: data.status, updatedOrder: response.data };
     } catch (error: any) {
         return rejectWithValue(error.response?.data?.message || "Failed to update order status");
     }
@@ -519,27 +519,29 @@ const ApiSlice = createSlice({
                 state.error = action.payload || action.error.message || "something went wrong";
             })
 
-            .addCase(updateOrderStatusAsync.pending, (state) =>{
+            .addCase(updateOrderStatusAsync.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(updateOrderStatusAsync.fulfilled, (state, action) =>{
+            .addCase(updateOrderStatusAsync.fulfilled, (state, action) => {
                 state.loading = false;
-                const { orderId, status } = action.payload;
-                // Update status in BuyerOrder
-                // const buyerOrder = state.BuyerOrder.find(order => order.id === orderId);
-                // console.log("Buyer order to update:", buyerOrder);
-                // if (buyerOrder) {
-                //     buyerOrder.status = status;
-                // }
-                // Update status in SellerOrder
-                // const sellerOrder = state.SellerOrder.find(order => order.id === orderId);
-                // console.log("Seller order to update:", sellerOrder);
-                // if (sellerOrder) {
-                //     sellerOrder.status = status;
-                // }
+                const { orderId, status, updatedOrder } = action.payload;
+
+                const updateOrderInList = (list: Order[]) => {
+                    const index = list.findIndex((order) => order.id === orderId);
+                    if (index !== -1) {
+                        if (updatedOrder) {
+                            list[index] = { ...list[index], ...updatedOrder, status };
+                        } else {
+                            list[index].status = status;
+                        }
+                    }
+                };
+
+                updateOrderInList(state.BuyerOrder);
+                updateOrderInList(state.SellerOrder);
             })
-            .addCase(updateOrderStatusAsync.rejected, (state, action) =>{
+            .addCase(updateOrderStatusAsync.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || action.error.message || "something went wrong";
             });

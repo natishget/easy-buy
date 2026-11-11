@@ -12,7 +12,11 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // read allowed origins from env (comma-separated) or default to localhost:3000
-  const allowedOrigins = (process.env.ORIGIN || 'http://localhost:3000').split(',');
+  const allowedOrigins = process.env.ORIGIN?.split(',');
+
+  if (!allowedOrigins) {
+    throw new Error('ORIGIN environment variable is not defined');
+  }
 
   app.enableCors({
     // when credentials are used, origin must be explicit

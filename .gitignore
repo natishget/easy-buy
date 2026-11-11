@@ -6,8 +6,14 @@ server/node_modules
 client/.env
 server/.env
 
+#pnpm workspace
+client/pnpm-workspace.yaml
+server/pnpm-workspace.yaml
+
+
 # Logs
 *.log
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

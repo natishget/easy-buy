@@ -1,4 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Put, Param, Delete, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Put,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ForbiddenException,
+  UnauthorizedException,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -11,22 +25,27 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   @Post('create')
   create(@Req() req: any, @Body() createOrderDto: CreateOrderDto[]) {
-    const isSeller = req.user?.sub || req.user?.isSeller;
-    if(isSeller) {
-      throw new Error('Sellers cannot place orders');
+    const isSeller = !!req.user?.isSeller || req.user?.role === 'seller';
+    if (isSeller) {
+      throw new ForbiddenException('Sellers cannot place orders');
     }
-    const buyerId = req.user?.sub || req.user?.id || req.user?.userId;
+    const buyerId = Number(req.user?.userId || req.user?.id || req.user?.sub);
+    if (!buyerId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
     return this.orderService.create(createOrderDto, buyerId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get')
   findAll() {
     return this.orderService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get/:id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -36,36 +55,52 @@ export class OrderController {
     if (isSeller) {
       throw new ForbiddenException('Buyers cannot access seller orders');
     }
-    const buyerId = Number(req.user?.sub || req.user?.id || req.user?.userId)
+    const buyerId = Number(req.user?.userId || req.user?.id || req.user?.sub);
+    if (!buyerId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
     return this.orderService.findByBuyerId(buyerId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('getSellerOrders/')
+  @Get('getSellerOrders')
   findBySellerId(@Req() req: any) {
     const isSeller = !!req.user?.isSeller || req.user?.role === 'seller';
     if (!isSeller) {
       throw new ForbiddenException('Buyers cannot access seller orders');
     }
-    const sellerId = Number(req.user?.sub || req.user?.id || req.user?.userId);
+    const sellerId = Number(req.user?.userId || req.user?.id || req.user?.sub);
+    if (!sellerId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
     return this.orderService.findBySellerId(sellerId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('update/:id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    return this.orderService.update(id, updateOrderDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('updateStatus/:id')
-  updateStatus(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto, @Req() req: any) {
-    const userId = req.user?.sub || req.user?.id || req.user?.userId;
-    return this.orderService.updateStatus(+userId, +id, updateOrderDto);
+  updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderDto: UpdateOrderDto,
+    @Req() req: any,
+  ) {
+    const userId = Number(req.user?.userId || req.user?.id || req.user?.sub);
+    if (!userId) {
+      throw new UnauthorizedException('User ID not found in token');
+    }
+    return this.orderService.updateStatus(userId, id, updateOrderDto);
   }
 
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.remove(id);
   }
 }

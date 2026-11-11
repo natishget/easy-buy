@@ -1,59 +1,42 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import OrderCard from "@/compoenents/cards/orderCard";
-
-// redux
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/state/store";
 import { getBuyerOrdersAsync } from "@/state/API/ApiSlice";
-
-interface Order {
-  id: number;
-  product: {
-    id: number;
-    title: string;
-    price: number;
-    description: string;
-    category: string;
-    seller: {
-      id: number;
-      name: string;
-      phone: string;
-      email: string;
-      isSeller: boolean;
-    };
-  };
-  buyer: {
-    id: number;
-    name: string;
-    phone: string;
-    email: string;
-    isSeller: boolean;
-  };
-  quantity: number;
-  createdAt: Date;
-  status: string;
-}
+import { Loader2, PackageOpen } from "lucide-react";
 
 const Orders: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const orders = useSelector((state: RootState) => state.api.BuyerOrder);
+  const loading = useSelector((state: RootState) => state.api.loading);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await dispatch(getBuyerOrdersAsync()).unwrap();
-        setOrders(response);
-      } catch (error) {
-        console.log("Error fetching buyer orders:", error);
-      }
-    };
-
-    fetchOrders();
+    dispatch(getBuyerOrdersAsync());
   }, [dispatch]);
+
+  if (loading && (!orders || orders.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full py-16 text-gray-500">
+        <Loader2 className="w-8 h-8 animate-spin text-teal-600 mb-2" />
+        <p className="text-base font-medium">Loading your orders...</p>
+      </div>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full py-16 text-gray-500">
+        <PackageOpen className="w-12 h-12 text-gray-400 mb-3" />
+        <p className="text-xl font-semibold">No orders yet</p>
+        <p className="text-sm text-gray-400 mt-1">Orders you place will appear here.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-fit flex flex-wrap ">
+    <div className="w-full flex flex-wrap gap-4">
       {orders.map((order) => (
         <OrderCard key={order.id} orderData={order} />
       ))}
